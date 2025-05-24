@@ -3,7 +3,11 @@
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+
+#Autowire .env vars
 parameters:
+    frontendDomain: '%env(FRONTEND_DOMAIN)%'
+    frontendDomainLoginCallbackEndpoint: '%env(FRONTEND_LOGIN_CALLBACK_ENDPOINT)%'
 
 services:
     # default configuration for services in *this* file
@@ -20,5 +24,9 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    App\Controller\Api\LoginController:
+        arguments:
+            $frontendDomain: '%frontendDomain%'
+            $frontendLoginCallbackEndpoint: '%frontendDomainLoginCallbackEndpoint%'
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

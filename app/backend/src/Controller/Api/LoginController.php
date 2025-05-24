@@ -4,7 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,6 +16,15 @@ use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 
 final class LoginController extends AbstractController
 {
+    private string $frontendDomain;
+    private string $frontendLoginCallbackEndpoint;
+
+    public function __construct(string $frontendDomain, string $frontendLoginCallbackEndpoint)
+    {
+        $this->frontendDomain = $frontendDomain;
+        $this->frontendLoginCallbackEndpoint = $frontendLoginCallbackEndpoint;
+    }
+
     #[Route('/api/login', name: 'login', methods: ['POST'])]
     public function login(
         Request $request,
@@ -56,10 +65,11 @@ final class LoginController extends AbstractController
     #[Route('/api/login/google/check', name: 'connect_google_validation')]
     public function connectGoogleCheck(
         ClientRegistry $clientRegistry,
-        EntityManager $em,
+        EntityManagerInterface $em,
         JWTTokenManagerInterface $jwtManager
-    ): JsonResponse {
+    ): RedirectResponse {
         $client = $clientRegistry->getClient('google');
+
         $googleUser = $client->fetchUser();
 
         $email = $googleUser->getEmail();
@@ -70,18 +80,15 @@ final class LoginController extends AbstractController
             $user = new User();
             $user->setEmail($email);
             $user->setRoles(['ROLE_USER']);
+            $user->setPassword('');
             $em->persist($user);
             $em->flush();
         }
 
         $token = $jwtManager->create($user);
 
-        return new JsonResponse([
-            'token' => $token,
-            'user' => [
-                'email' => $user->getEmail(),
-                'roles' => $user->getRoles()
-            ]
-        ]);
+        $redirectUrl = $this->frontendDomain . $this->frontendLoginCallbackEndpoint . '?token=' . $token;
+
+        return $this->redirect($redirectUrl);
     }
 }
