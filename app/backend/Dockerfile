@@ -5,6 +5,13 @@ RUN apt-get update && apt-get install -y \
     git unzip zip libpq-dev \
     && docker-php-ext-install pdo pdo_pgsql
 
+# Install Xdebug
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug
+
+# Copy xdebug config file
+COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
+
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 

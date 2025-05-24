@@ -22,6 +22,10 @@ services:
     volumes:
       - ./frontend:/var/www/html/app/frontend
       - /var/www/html/app/frontend/node_modules
+    environment:
+      - WATCHPACK_POLLING=true
+    env_file:
+      - ./frontend/.env
     stdin_open: true
     tty: true
 
