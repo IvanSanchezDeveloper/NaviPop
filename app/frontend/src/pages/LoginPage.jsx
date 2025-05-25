@@ -6,14 +6,13 @@ export default function LoginPage() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
-    const backendUrl = process.env.REACT_APP_BACKEND_URL;
-    console.log('BACKEND_URL:', process.env.REACT_APP_BACKEND_URL);
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     const handleLogin = async (e) => {
         e.preventDefault();
 
         try {
-            const response = await axios.post('${backendUrl}/api/login', {
+            const response = await axios.post(`${backendUrl}/api/login`, {
                 email,
                 password,
             });
