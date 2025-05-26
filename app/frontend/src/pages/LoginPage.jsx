@@ -1,27 +1,20 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { FcGoogle } from 'react-icons/fc';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     const handleLogin = async (e) => {
         e.preventDefault();
-
         try {
-            const response = await axios.post(`${backendUrl}/api/login`, {
-                email,
-                password,
-            });
-
-            const { token } = response.data;
-            localStorage.setItem('jwt', token);
-            // Redirige o navega al home
-            window.location.href = '/dashboard'; // o usa React Router
-        } catch (err) {
+            const { data } = await axios.post(`${backendUrl}/api/login`, { email, password });
+            localStorage.setItem('jwt', data.token);
+            window.location.href = '/dashboard';
+        } catch {
             setError('Email o contraseña incorrectos');
         }
     };
@@ -31,38 +24,57 @@ export default function LoginPage() {
     };
 
     return (
-        <div style={{ maxWidth: 400, margin: '50px auto' }}>
-            <h2>Login</h2>
-            <form onSubmit={handleLogin}>
-                <div>
+        <div className="flex flex-col items-center justify-center px-4">
+            <div className="w-full max-w-md p-8 rounded-xl shadow-md bg-primary overflow-y-auto">
+                <h2 className="text-3xl font-bold text-center text-primaryText mb-8">
+                    Sign in to NAVIPop
+                </h2>
+
+                <form onSubmit={handleLogin} className="space-y-6">
                     <input
                         type="email"
-                        placeholder="Correo electrónico"
+                        placeholder="E-mail"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        style={{ width: '100%', marginBottom: 10 }}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondaryText focus:outline-none bg-white text-primaryText"
                     />
-                </div>
-                <div>
+
                     <input
                         type="password"
-                        placeholder="Contraseña"
+                        placeholder="Password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        style={{ width: '100%', marginBottom: 10 }}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondaryText focus:outline-none bg-white text-primaryText"
                     />
+
+                    {error && (
+                        <div className="text-sm font-medium text-secondaryText">{error}</div>
+                    )}
+
+                    <button
+                        type="submit"
+                        className="w-full py-3 rounded-lg border border-gray-300 bg-white text-primaryText hover:ring-2 hover:ring-secondaryText transition"
+                    >
+                        Sign in
+                    </button>
+                </form>
+
+                <div className="flex items-center my-8">
+                    <hr className="flex-grow border-gray-300" />
+                    <span className="mx-4 text-sm text-primaryText select-none">or</span>
+                    <hr className="flex-grow border-gray-300" />
                 </div>
-                {error && <div style={{ color: 'red' }}>{error}</div>}
-                <button type="submit" style={{ width: '100%' }}>Iniciar sesión</button>
-            </form>
 
-            <hr />
-
-            <button onClick={handleGoogleLogin} style={{ width: '100%', marginTop: 10 }}>
-                Iniciar sesión con Google
-            </button>
+                <button
+                    onClick={handleGoogleLogin}
+                    className="w-full flex items-center justify-center gap-3 py-3 rounded-lg border border-gray-300 bg-white text-primaryText hover:ring-2 hover:ring-secondaryText transition"
+                >
+                    <FcGoogle className="text-2xl" />
+                    Sign in with Google
+                </button>
+            </div>
         </div>
     );
 }
