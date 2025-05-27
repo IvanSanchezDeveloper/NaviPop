@@ -7,7 +7,7 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/var/www/html/app/backend
-      - /var/www/html/app/backend/vendor
+      - vendor:/var/www/html/app/backend/vendor
     depends_on:
       - db
     environment:
@@ -42,3 +42,4 @@ services:
 volumes:
   pgdata:
   node_modules:
+  vendor:

@@ -4,6 +4,7 @@ namespace App\Controller\Api;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Service\LoginManager;
 use Doctrine\ORM\EntityManagerInterface;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,11 +19,13 @@ final class LoginController extends AbstractController
 {
     private string $frontendDomain;
     private string $frontendLoginCallbackEndpoint;
+    private LoginManager $loginManager;
 
-    public function __construct(string $frontendDomain, string $frontendLoginCallbackEndpoint)
+    public function __construct(string $frontendDomain, string $frontendLoginCallbackEndpoint, LoginManager $loginManager)
     {
         $this->frontendDomain = $frontendDomain;
         $this->frontendLoginCallbackEndpoint = $frontendLoginCallbackEndpoint;
+        $this->loginManager = $loginManager;
     }
 
     #[Route('/api/login', name: 'login', methods: ['POST'])]
@@ -30,18 +33,13 @@ final class LoginController extends AbstractController
         Request $request,
         UserRepository $userRepository,
         JWTTokenManagerInterface $JWTManager,
-        UserPasswordHasherInterface $passwordHasher
     ): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $email = $data['email'] ?? '';
         $password = $data['password'] ?? '';
 
-        $user = $userRepository->findOneBy(['email' => $email]);
-
-        if (!$user || !$passwordHasher->isPasswordValid($user, $password)) {
-            return new JsonResponse(['error' => 'Credenciales inválidas'], 401);
-        }
+        $user = $this->loginManager->handleStandardLogin($email, $password);
 
         $token = $JWTManager->create($user);
 
@@ -69,21 +67,12 @@ final class LoginController extends AbstractController
         JWTTokenManagerInterface $jwtManager
     ): RedirectResponse {
         $client = $clientRegistry->getClient('google');
-
         $googleUser = $client->fetchUser();
 
         $email = $googleUser->getEmail();
+        $googleId = $googleUser->getId();
 
-        $user = $em->getRepository(User::class)->findOneBy(['email' => $email]);
-
-        if (!$user) {
-            $user = new User();
-            $user->setEmail($email);
-            $user->setRoles(['ROLE_USER']);
-            $user->setPassword('');
-            $em->persist($user);
-            $em->flush();
-        }
+        $user = $this->loginManager->handleGoogleLogin($email, $googleId);
 
         $token = $jwtManager->create($user);
 
@@ -91,4 +80,5 @@ final class LoginController extends AbstractController
 
         return $this->redirect($redirectUrl);
     }
+
 }
