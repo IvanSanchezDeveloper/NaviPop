@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { FcGoogle } from 'react-icons/fc';
 
@@ -14,8 +15,10 @@ export default function LoginPage() {
             const { data } = await axios.post(`${backendUrl}/api/login`, { email, password });
             localStorage.setItem('jwt', data.token);
             window.location.href = '/dashboard';
-        } catch {
-            setError('Email o contraseña incorrectos');
+        } catch (err){
+
+            const message = err?.response?.data?.message || 'Something went wrong';
+            setError(message);
         }
     };
 
@@ -62,18 +65,27 @@ export default function LoginPage() {
                 </form>
 
                 <div className="flex items-center my-8">
-                    <hr className="flex-grow border-gray-300" />
+                    <hr className="flex-grow border-gray-300"/>
                     <span className="mx-4 text-sm text-primaryText select-none">or</span>
-                    <hr className="flex-grow border-gray-300" />
+                    <hr className="flex-grow border-gray-300"/>
                 </div>
 
                 <button
                     onClick={handleGoogleLogin}
                     className="w-full flex items-center justify-center gap-3 py-3 rounded-lg border border-gray-300 bg-white text-primaryText hover:ring-2 hover:ring-secondaryText transition"
                 >
-                    <FcGoogle className="text-2xl" />
+                    <FcGoogle className="text-2xl"/>
                     Sign in with Google
                 </button>
+
+                <div className="mt-6 text-center">
+                    <p className="text-sm text-primaryText">
+                        Don’t have an account yet?{' '}
+                        <Link to="/register" className="text-secondaryText hover:underline font-medium">
+                            Register here
+                        </Link>
+                    </p>
+                </div>
             </div>
         </div>
     );

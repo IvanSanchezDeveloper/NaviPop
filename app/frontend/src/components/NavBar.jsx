@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FaGithub } from 'react-icons/fa';
 import { HiOutlineMenu, HiOutlineX } from 'react-icons/hi';
+import { Link } from 'react-router-dom';
 
 export default function NavBar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -31,18 +32,24 @@ export default function NavBar() {
                     </button>
                 ) : (
                     <div className="absolute left-1/2 transform -translate-x-1/2 flex space-x-6 text-2xl">
-                        <a href="/"
-                           className="text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] transition-colors duration-200 font-semibold">
+                        <Link
+                            to="/"
+                            className="text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] transition-colors duration-200 font-semibold"
+                        >
                             Home
-                        </a>
-                        <a href="/"
-                           className="text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] transition-colors duration-200">
+                        </Link>
+                        <Link
+                            to="/placeholder"
+                            className="text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] transition-colors duration-200"
+                        >
                             Placeholder
-                        </a>
-                        <a href="/"
-                           className="text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] transition-colors duration-200">
+                        </Link>
+                        <Link
+                            to="/placeholder2"
+                            className="text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] transition-colors duration-200"
+                        >
                             Placeholder
-                        </a>
+                        </Link>
                     </div>
                 )}
 
@@ -62,20 +69,27 @@ export default function NavBar() {
             {isCompactView && isMenuOpen && (
                 <div className="px-4 pb-4">
                     <div className="flex flex-col space-y-2 text-lg">
-                        <a href="/"
-                           className="text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] transition-colors duration-200 font-semibold">
+                        <Link
+                            to="/"
+                            className="text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] transition-colors duration-200 font-semibold"
+                        >
                             Home
-                        </a>
-                        <a href="/"
-                           className="text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] transition-colors duration-200">
+                        </Link>
+                        <Link
+                            to="/placeholder"
+                            className="text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] transition-colors duration-200"
+                        >
                             Placeholder
-                        </a>
-                        <a href="/"
-                           className="text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] transition-colors duration-200">
+                        </Link>
+                        <Link
+                            to="/placeholder2"
+                            className="text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] transition-colors duration-200"
+                        >
                             Placeholder
-                        </a>
+                        </Link>
                     </div>
                 </div>
+
             )}
         </nav>
     );
