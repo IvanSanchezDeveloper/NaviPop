@@ -2,8 +2,6 @@
 
 namespace App\Exception;
 
-use Symfony\Component\HttpKernel\Exception\HttpException;
-
 class WrongCredentialsException extends AbstractApiException implements ApiExceptionInterface
 {
     public function __construct()

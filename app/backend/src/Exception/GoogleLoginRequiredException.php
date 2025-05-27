@@ -2,8 +2,6 @@
 
 namespace App\Exception;
 
-use Symfony\Component\HttpKernel\Exception\HttpException;
-
 class GoogleLoginRequiredException extends AbstractApiException implements ApiExceptionInterface
 {
     public function __construct(string $email)

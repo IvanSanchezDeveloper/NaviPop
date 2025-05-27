@@ -2,8 +2,6 @@
 
 namespace App\Exception;
 
-use Symfony\Component\HttpKernel\Exception\HttpException;
-
 class LinkGoogleAccountException extends AbstractApiException implements ApiExceptionInterface
 {
     private string $googleId;
