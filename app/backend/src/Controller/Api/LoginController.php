@@ -2,8 +2,7 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\User;
-use App\Repository\UserRepository;
+use App\Exception\AbstractApiException;
 use App\Service\LoginManager;
 use Doctrine\ORM\EntityManagerInterface;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
@@ -12,7 +11,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 
 final class LoginController extends AbstractController
@@ -31,7 +29,6 @@ final class LoginController extends AbstractController
     #[Route('/api/login', name: 'login', methods: ['POST'])]
     public function login(
         Request $request,
-        UserRepository $userRepository,
         JWTTokenManagerInterface $JWTManager,
     ): JsonResponse
     {
@@ -72,11 +69,15 @@ final class LoginController extends AbstractController
         $email = $googleUser->getEmail();
         $googleId = $googleUser->getId();
 
-        $user = $this->loginManager->handleGoogleLogin($email, $googleId);
+        try {
+            $user = $this->loginManager->handleGoogleLogin($email, $googleId);
+            $token = $jwtManager->create($user);
 
-        $token = $jwtManager->create($user);
-
-        $redirectUrl = $this->frontendDomain . $this->frontendLoginCallbackEndpoint . '?token=' . $token;
+            $redirectUrl = $this->frontendDomain . $this->frontendLoginCallbackEndpoint . '?token=' . $token;
+        } catch (AbstractApiException $e) {
+            $errorMsg = urlencode($e->getMessage() ?: 'Login failed');
+            $redirectUrl = $this->frontendDomain . $this->frontendLoginCallbackEndpoint . '?error=' . $errorMsg;
+        }
 
         return $this->redirect($redirectUrl);
     }
