@@ -33,11 +33,11 @@ class LoginManager
         }
 
         if ($user->isGoogleUser()) {
-            throw new GoogleLoginRequiredException($email);
+            throw new GoogleLoginRequiredException();
         }
 
         if (!$this->passwordHasher->isPasswordValid($user, $password)) {
-            throw new WrongCredentialsException('Wrong credentials');
+            throw new WrongCredentialsException();
         }
 
         return $user;
@@ -54,12 +54,13 @@ class LoginManager
 
         $existingUser = $this->userRepository->findOneBy(['email' => $email]);
         if ($existingUser) {
-            throw new LinkGoogleAccountException($email, $googleId);
+            throw new LinkGoogleAccountException($email);
         }
 
         $newUser = new User();
         $newUser->setEmail($email);
         $newUser->setGoogleId($googleId);
+        $newUser->setPassword(''); // No need password for Google accounts
 
         $this->em->persist($newUser);
         $this->em->flush();

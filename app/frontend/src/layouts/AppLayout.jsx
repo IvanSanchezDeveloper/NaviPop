@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 
 export default function AppLayout() {
     return (
-        <div className="grid min-h-screen grid-rows-[auto_1fr_auto] bg-[var(--color-primary)] text-[var(--color-primaryText)]">
+        <div className="grid min-h-screen grid-rows-[auto_1fr_auto] bg-white text-[var(--color-primaryText)]">
             <header>
                 <NavBar />
             </header>

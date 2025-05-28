@@ -1,14 +1,22 @@
 import { useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 
 export default function LoginCallback() {
     const [params] = useSearchParams();
+    const navigate = useNavigate();
 
     useEffect(() => {
+        const error = params.get('error');
+
+        if (error) {
+            navigate('/login', { state: { error: error } });
+            return
+        }
+
         const token = params.get('token');
         if (token) {
             localStorage.setItem('jwt', token);
-            window.location.href = '/dashboard';
+            navigate('/dashboard');
         }
     }, [params]);
 

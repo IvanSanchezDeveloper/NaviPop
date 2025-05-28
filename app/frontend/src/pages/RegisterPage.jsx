@@ -1,37 +1,28 @@
-import { useState, useEffect } from 'react';
-import { Link, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { FcGoogle } from 'react-icons/fc';
 
-export default function LoginPage() {
-    const [params] = useSearchParams();
+export default function RegisterPage() {
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    const navigate = useNavigate();
 
-    const location = useLocation();
-
-    useEffect(() => {
-        if (location.state?.error) {
-            setError(location.state.error);
-        }
-    }, [location.state]);;
-
-    const handleLogin = async (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
         try {
-            const { data } = await axios.post(`${backendUrl}/api/login`, { email, password });
+            const { data } = await axios.post(`${backendUrl}/api/register`, { email, password, name});
             localStorage.setItem('jwt', data.token);
-            navigate('/dashboard');
-        } catch (err){
-            const message = err?.response?.data?.message || 'Something went wrong';
+            window.location.href = '/dashboard';
+        } catch (err) {
+            const message = err?.response?.data?.message || 'Registration failed';
             setError(message);
         }
     };
 
-    const handleGoogleLogin = () => {
+    const handleGoogleRegister = () => {
         window.location.href = `${backendUrl}/api/login/google`;
     };
 
@@ -39,10 +30,18 @@ export default function LoginPage() {
         <div className="flex flex-col items-center justify-center px-4">
             <div className="w-full max-w-md p-8 rounded-xl shadow-md bg-primary overflow-y-auto">
                 <h2 className="text-3xl font-bold text-center text-primaryText mb-8">
-                    Sign in to NAVIPop
+                    Create your account
                 </h2>
 
-                <form onSubmit={handleLogin} className="space-y-6">
+                <form onSubmit={handleRegister} className="space-y-6">
+                    <input
+                        type="text"
+                        placeholder="Full Name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondaryText focus:outline-none bg-white text-primaryText"
+                    />
                     <input
                         type="email"
                         placeholder="E-mail"
@@ -69,15 +68,9 @@ export default function LoginPage() {
                         type="submit"
                         className="w-full py-3 rounded-lg border border-gray-300 bg-white text-primaryText hover:ring-2 hover:ring-secondaryText transition"
                     >
-                        Sign in
+                        Register
                     </button>
                 </form>
-
-                <div className="w-full text-right mt-2">
-                    <Link to="/forgot-password" className="text-sm text-secondaryText hover:underline">
-                        Forgot your password?
-                    </Link>
-                </div>
 
                 <div className="flex items-center my-8">
                     <hr className="flex-grow border-gray-300"/>
@@ -86,18 +79,18 @@ export default function LoginPage() {
                 </div>
 
                 <button
-                    onClick={handleGoogleLogin}
+                    onClick={handleGoogleRegister}
                     className="w-full flex items-center justify-center gap-3 py-3 rounded-lg border border-gray-300 bg-white text-primaryText hover:ring-2 hover:ring-secondaryText transition"
                 >
                     <FcGoogle className="text-2xl"/>
-                    Sign in with Google
+                    Register with Google
                 </button>
 
                 <div className="mt-6 text-center">
                     <p className="text-sm text-primaryText">
-                        Don’t have an account yet?{' '}
-                        <Link to="/register" className="text-secondaryText hover:underline font-medium">
-                            Register here
+                        Already have an account?{' '}
+                        <Link to="/login" className="text-secondaryText hover:underline font-medium">
+                            Sign in here
                         </Link>
                     </p>
                 </div>

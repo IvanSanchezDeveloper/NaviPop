@@ -4,9 +4,9 @@ namespace App\Exception;
 
 class GoogleLoginRequiredException extends AbstractApiException implements ApiExceptionInterface
 {
-    public function __construct(string $email)
+    public function __construct()
     {
-        parent::__construct($this->getStatusCode(), sprintf('User %s must log in via Google.', $email));
+        parent::__construct($this->getStatusCode(), sprintf('This user must log in via Google.'));
     }
 
     public function getStatusCode(): int

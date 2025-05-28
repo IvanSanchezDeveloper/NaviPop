@@ -4,13 +4,11 @@ namespace App\Exception;
 
 class LinkGoogleAccountException extends AbstractApiException implements ApiExceptionInterface
 {
-    private string $googleId;
     private string $email;
 
-    public function __construct(string $email, string $googleId)
+    public function __construct(string $email)
     {
-        parent::__construct($this->getStatusCode(), 'Account exists—please link your Google login.');
-        $this->googleId = $googleId;
+        parent::__construct($this->getStatusCode(), 'Account exists. Please link your Google account.');
         $this->email    = $email;
     }
 
@@ -24,7 +22,6 @@ class LinkGoogleAccountException extends AbstractApiException implements ApiExce
         return [
             'error_code' => 'link_google_account',
             'email'      => $this->email,
-            'google_id'  => $this->googleId,
         ];
     }
 }
