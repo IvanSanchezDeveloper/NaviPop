@@ -26,7 +26,7 @@ class LoginManager
 
     public function handleStandardLogin(string $email, string $password): User
     {
-        $user = $this->userRepository->findOneBy(['email' => $email]);
+        $user = $this->userRepository->findOneByEmail($email);
 
         if (!$user) {
             throw new UserNotFoundException();
@@ -45,14 +45,14 @@ class LoginManager
 
     public function handleGoogleLogin(string $email, ?string $googleId = null): User
     {
-        $googleUser = $this->userRepository->findOneBy(['googleId' => $googleId]);
+        $googleUser = $this->userRepository->findOneByGoogleId($googleId);
 
         if ($googleUser) {
             return $googleUser;
         }
 
 
-        $existingUser = $this->userRepository->findOneBy(['email' => $email]);
+        $existingUser = $this->userRepository->findOneByEmail($email);
         if ($existingUser) {
             throw new LinkGoogleAccountException($email);
         }

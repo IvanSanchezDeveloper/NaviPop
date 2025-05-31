@@ -122,6 +122,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->googleId = $googleId;
     }
 
+    public function getGoogleId(): ?string
+    {
+        return $this->googleId;
+    }
+
     /**
      * @see UserInterface
      */

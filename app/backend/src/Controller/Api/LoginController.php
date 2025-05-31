@@ -60,7 +60,6 @@ final class LoginController extends AbstractController
     #[Route('/api/login/google/check', name: 'connect_google_validation')]
     public function connectGoogleCheck(
         ClientRegistry $clientRegistry,
-        EntityManagerInterface $em,
         JWTTokenManagerInterface $jwtManager
     ): RedirectResponse {
         $client = $clientRegistry->getClient('google');
