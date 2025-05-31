@@ -8,6 +8,7 @@ use App\Service\LoginManager;
 use App\Tests\TestCase\AbstractApiTestCase;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\OAuth2Client;
+use League\OAuth2\Client\Provider\GoogleUser;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -100,5 +101,24 @@ class LoginControllerTest extends AbstractApiTestCase
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertEquals(self::GOOGLE_LOGIN_ERROR_REDIRECT_URL, $response->getTargetUrl());
+    }
+
+    protected function mockGoogleUser(): GoogleUser
+    {
+        $googleUserMock = $this->createMock(GoogleUser::class);
+        $googleUserMock->method('getEmail')->willReturn(self::EMAIL);
+        $googleUserMock->method('getId')->willReturn(self::GOOGLE_ID);
+        return $googleUserMock;
+    }
+
+    protected function mockClientRegistry(GoogleUser $googleUser): ClientRegistry
+    {
+        $googleClientMock = $this->createMock(OAuth2Client::class);
+        $googleClientMock->method('fetchUser')->willReturn($googleUser);
+
+        $clientRegistryMock = $this->createMock(ClientRegistry::class);
+        $clientRegistryMock->method('getClient')->with('google')->willReturn($googleClientMock);
+
+        return $clientRegistryMock;
     }
 }

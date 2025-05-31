@@ -38,25 +38,6 @@ abstract class AbstractApiTestCase extends WebTestCase
         return $user;
     }
 
-    protected function mockGoogleUser(): GoogleUser
-    {
-        $googleUserMock = $this->createMock(GoogleUser::class);
-        $googleUserMock->method('getEmail')->willReturn(self::EMAIL);
-        $googleUserMock->method('getId')->willReturn(self::GOOGLE_ID);
-        return $googleUserMock;
-    }
-
-    protected function mockClientRegistry(GoogleUser $googleUser): ClientRegistry
-    {
-        $googleClientMock = $this->createMock(OAuth2Client::class);
-        $googleClientMock->method('fetchUser')->willReturn($googleUser);
-
-        $clientRegistryMock = $this->createMock(ClientRegistry::class);
-        $clientRegistryMock->method('getClient')->with('google')->willReturn($googleClientMock);
-
-        return $clientRegistryMock;
-    }
-
     protected function mockJwtManager(string $token = self::JWT_TOKEN): JWTTokenManagerInterface
     {
         $jwtManagerMock = $this->createMock(JWTTokenManagerInterface::class);
