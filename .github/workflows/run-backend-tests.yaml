@@ -6,8 +6,12 @@ on:
       - main
 
 jobs:
-  php-tests:
+  backend-tests:
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: app/backend
 
     steps:
       - uses: actions/checkout@v4
