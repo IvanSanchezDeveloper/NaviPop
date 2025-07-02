@@ -1,11 +1,21 @@
-FROM php:8.4-cli
+FROM php:8.3-cli
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
+    zlib1g-dev \
+    libzip-dev \
+    libicu-dev \
+    libcurl4-openssl-dev \
+    libssl-dev \
     iproute2 \
     git unzip zip libpq-dev \
-    && docker-php-ext-install pdo pdo_pgsql
-
+    libxml2-dev \
+    && docker-php-ext-install \
+        pdo \
+        pdo_pgsql \
+        zip \
+        soap \
+        curl
 
 # Install Xdebug
 RUN pecl install xdebug && docker-php-ext-enable xdebug && \
@@ -31,5 +41,4 @@ COPY . .
 
 EXPOSE 8000 9003
 
-# Do nothing
 CMD ["tail", "-f", "/dev/null"]

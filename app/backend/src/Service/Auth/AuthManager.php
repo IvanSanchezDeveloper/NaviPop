@@ -1,5 +1,5 @@
 <?php
-namespace App\Service;
+namespace App\Service\Auth;
 
 use App\Entity\User;
 use App\Exception\GoogleLoginRequiredException;
@@ -8,10 +8,9 @@ use App\Exception\UserNotFoundException;
 use App\Exception\WrongCredentialsException;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class LoginManager
+class AuthManager
 {
     private EntityManagerInterface $em;
     private UserRepository $userRepository;
