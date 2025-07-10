@@ -3,10 +3,6 @@
 namespace App\Tests\TestCase;
 
 use App\Entity\User;
-use App\Service\LoginManager;
-use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
-use KnpU\OAuth2ClientBundle\Client\OAuth2Client;
-use League\OAuth2\Client\Provider\GoogleUser;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;

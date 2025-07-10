@@ -1,5 +1,5 @@
 <?php
-namespace App\Tests\Service;
+namespace App\Tests\Service\Auth;
 
 use App\Entity\User;
 use App\Exception\GoogleLoginRequiredException;
@@ -7,12 +7,12 @@ use App\Exception\LinkGoogleAccountException;
 use App\Exception\UserNotFoundException;
 use App\Exception\WrongCredentialsException;
 use App\Repository\UserRepository;
-use App\Service\LoginManager;
+use App\Service\Auth\AuthManager;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class LoginManagerTest extends TestCase
+class AuthManagerTest extends TestCase
 {
     private const EMAIL = 'email@example.com';
     private const PASSWORD = 'password';
@@ -21,7 +21,7 @@ class LoginManagerTest extends TestCase
     private EntityManagerInterface $em;
     private UserRepository $userRepository;
     private UserPasswordHasherInterface $passwordHasher;
-    private LoginManager $loginManager;
+    private AuthManager $loginManager;
 
     protected function setUp(): void
     {
@@ -31,7 +31,7 @@ class LoginManagerTest extends TestCase
 
         $this->em->method('getRepository')->willReturn($this->userRepository);
 
-        $this->loginManager = new LoginManager($this->em, $this->passwordHasher);
+        $this->loginManager = new AuthManager($this->em, $this->passwordHasher);
     }
 
     private function createUserMock(bool $isGoogleUser = false): User
