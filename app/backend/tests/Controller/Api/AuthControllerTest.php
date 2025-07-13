@@ -19,11 +19,10 @@ use Symfony\Component\HttpFoundation\Response;
 class AuthControllerTest extends AbstractApiTestCase
 {
     protected const FRONTEND_URL = 'http://frontend.test';
-    protected const FRONTEND_CALLBACK = '/callback';
     protected const LOGIN_ENDPOINT = '/api/login';
     protected const GOOGLE_REDIRECT_URL = 'https://accounts.google.com/o/oauth2/auth';
-    protected const GOOGLE_LOGIN_SUCCESS_REDIRECT_URL = self::FRONTEND_URL . self::FRONTEND_CALLBACK;
-    protected const GOOGLE_LOGIN_ERROR_REDIRECT_URL = self::FRONTEND_URL . self::FRONTEND_CALLBACK . '?error=' . 'Account+exists.+Please+link+your+Google+account.';
+    protected const GOOGLE_LOGIN_SUCCESS_REDIRECT_URL = self::FRONTEND_URL;
+    protected const GOOGLE_LOGIN_ERROR_REDIRECT_URL = self::FRONTEND_URL . '/login?error=' . 'Account+exists.+Please+link+your+Google+account.';
 
     private AuthManager|MockObject $loginManagerMock;
 
@@ -38,7 +37,7 @@ class AuthControllerTest extends AbstractApiTestCase
         $this->loginManagerMock->method('handleStandardLogin')
             ->willReturn($this->user);
 
-        $controller = new AuthController('', '', $this->loginManagerMock);
+        $controller = new AuthController('', $this->loginManagerMock);
 
         $request = new Request([], [], [], [], [], [], json_encode([
             'email' => self::EMAIL,
@@ -61,7 +60,7 @@ class AuthControllerTest extends AbstractApiTestCase
         $this->loginManagerMock->method('handleStandardLogin')
             ->willThrowException(new WrongCredentialsException());
 
-        $controller = new AuthController('', '', $this->loginManagerMock);
+        $controller = new AuthController('', $this->loginManagerMock);
 
         $request = new Request([], [], [], [], [], [], json_encode([
             'email' => self::EMAIL,
@@ -91,7 +90,6 @@ class AuthControllerTest extends AbstractApiTestCase
 
         $controller = new AuthController(
             self::FRONTEND_URL,
-            self::FRONTEND_CALLBACK,
             $this->loginManagerMock
         );
 
@@ -108,7 +106,6 @@ class AuthControllerTest extends AbstractApiTestCase
 
         $controller = new AuthController(
             self::FRONTEND_URL,
-            self::FRONTEND_CALLBACK,
             $this->loginManagerMock
         );
 
@@ -133,7 +130,6 @@ class AuthControllerTest extends AbstractApiTestCase
 
         $controller = new AuthController(
             self::FRONTEND_URL,
-            self::FRONTEND_CALLBACK,
             $this->loginManagerMock
         );
 
@@ -149,7 +145,7 @@ class AuthControllerTest extends AbstractApiTestCase
 
     public function testLogout(): void
     {
-        $controller = new AuthController('', '', $this->loginManagerMock);
+        $controller = new AuthController('', $this->loginManagerMock);
         $response = $controller->logout();
 
         $this->assertInstanceOf(JsonResponse::class, $response);

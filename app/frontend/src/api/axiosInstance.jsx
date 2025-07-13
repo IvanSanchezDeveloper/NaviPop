@@ -2,16 +2,21 @@ import axios from 'axios';
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-const instance = axios.create({
-    baseURL: '${backendUrl}/api',
+const axiosInstance = axios.create({
+    baseURL: `${backendUrl}/api`,
+    withCredentials: true
 });
 
-instance.interceptors.request.use((config) => {
-    const token = localStorage.getItem('jwt');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+axiosInstance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            if (window.location.pathname !== '/login') {
+                window.location.href = '/login';
+            }
+        }
+        return Promise.reject(error);
     }
-    return config;
-});
+);
 
-export default instance;
+export default axiosInstance;

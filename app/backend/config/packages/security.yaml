@@ -13,7 +13,9 @@ security:
         api:
             pattern: ^/api
             stateless: true
-            jwt: ~
+            jwt:
+                provider: app_user_provider
+                authenticator: lexik_jwt_authentication.security.jwt_authenticator
 
     access_control:
         - { path: ^/api/login,              roles: PUBLIC_ACCESS }

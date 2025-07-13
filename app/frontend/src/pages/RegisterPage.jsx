@@ -15,7 +15,7 @@ export default function RegisterPage() {
         try {
             const { data } = await axios.post(`${backendUrl}/api/register`, { email, password, name});
             localStorage.setItem('jwt', data.token);
-            window.location.href = '/dashboard';
+            window.location.href = '/';
         } catch (err) {
             const message = err?.response?.data?.message || 'Registration failed';
             setError(message);

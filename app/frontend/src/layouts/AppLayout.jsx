@@ -1,7 +1,11 @@
 import NavBar from '../components/NavBar.jsx';
 import { Outlet } from 'react-router-dom';
+import Loading from "../components/Loading";
+import { useLoading } from "../contexts/LoadingContext";
 
 export default function AppLayout() {
+    const { isLoading } = useLoading();
+
     return (
         <div className="grid min-h-screen grid-rows-[auto_1fr_auto] bg-white text-[var(--color-primaryText)]">
             <header>
@@ -10,7 +14,7 @@ export default function AppLayout() {
 
             <main className="flex items-center justify-center overflow-auto px-4">
                 <div className="w-full max-w-7xl">
-                    <Outlet />
+                    {isLoading ? <Loading /> : <Outlet />}
                 </div>
             </main>
 
