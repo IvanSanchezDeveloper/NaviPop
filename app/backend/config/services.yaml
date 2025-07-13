@@ -7,7 +7,6 @@
 #Autowire .env vars
 parameters:
     frontendDomain: '%env(FRONTEND_DOMAIN)%'
-    frontendDomainLoginCallbackEndpoint: '%env(FRONTEND_LOGIN_CALLBACK_ENDPOINT)%'
 
 services:
     _defaults:
@@ -24,5 +23,4 @@ services:
     App\Controller\Api\AuthController:
         arguments:
             $frontendDomain: '%frontendDomain%'
-            $frontendLoginCallbackEndpoint: '%frontendDomainLoginCallbackEndpoint%'
 

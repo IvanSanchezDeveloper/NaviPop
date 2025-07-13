@@ -1,35 +1,48 @@
 import { useState, useEffect } from 'react';
-import { Link, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
+import {Link, useSearchParams, useNavigate, useLocation, Navigate} from 'react-router-dom';
 import axios from 'axios';
 import { FcGoogle } from 'react-icons/fc';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function LoginPage() {
-    const [params] = useSearchParams();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
-
-    const location = useLocation();
+    const { login, logout, user, loading } = useAuth();
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const [searchParams] = useSearchParams();
 
     useEffect(() => {
-        if (location.state?.error) {
-            setError(location.state.error);
+        const errorParam = searchParams.get('error');
+        if (errorParam) {
+            console.log('🔴 Error capturado:', errorParam);
+            setError(decodeURIComponent(errorParam));
+
+            const url = new URL(window.location);
+            url.searchParams.delete('error');
+            window.history.replaceState({}, '', url);
         }
-    }, [location.state]);;
+    }, []);
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setError('');
+        setIsSubmitting(true);
+
         try {
-            const { data } = await axios.post(`${backendUrl}/api/login`, { email, password });
-            localStorage.setItem('jwt', data.token);
-            navigate('/dashboard');
-        } catch (err){
-            const message = err?.response?.data?.message || 'Something went wrong';
-            setError(message);
+            const result = await login(email, password);
+
+            if (!result.success) {
+                setError(result.error);
+            }
+
+        } finally {
+            setIsSubmitting(false);
         }
     };
+
 
     const handleGoogleLogin = () => {
         window.location.href = `${backendUrl}/api/login/google`;
@@ -49,6 +62,7 @@ export default function LoginPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
+                        disabled={isSubmitting}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondaryText focus:outline-none bg-white text-primaryText"
                     />
 
@@ -58,6 +72,7 @@ export default function LoginPage() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
+                        disabled={isSubmitting}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-secondaryText focus:outline-none bg-white text-primaryText"
                     />
 
@@ -67,9 +82,17 @@ export default function LoginPage() {
 
                     <button
                         type="submit"
+                        disabled={isSubmitting}
                         className="w-full py-3 rounded-lg border border-gray-300 bg-white text-primaryText hover:ring-2 hover:ring-secondaryText transition"
                     >
-                        Sign in
+                        {isSubmitting ? (
+                            <span className="flex items-center justify-center">
+                                <div className="animate-spin h-5 w-5 border-2 border-gray-500 rounded-full border-t-transparent" />
+                            </span>
+                        ) : (
+                            'Sign in'
+                        )}
+
                     </button>
                 </form>
 
@@ -87,6 +110,7 @@ export default function LoginPage() {
 
                 <button
                     onClick={handleGoogleLogin}
+                    disabled={isSubmitting}
                     className="w-full flex items-center justify-center gap-3 py-3 rounded-lg border border-gray-300 bg-white text-primaryText hover:ring-2 hover:ring-secondaryText transition"
                 >
                     <FcGoogle className="text-2xl"/>

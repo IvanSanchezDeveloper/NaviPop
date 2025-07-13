@@ -17,13 +17,11 @@ use Symfony\Component\Routing\Attribute\Route;
 final class AuthController extends AbstractController
 {
     private string $frontendDomain;
-    private string $frontendLoginCallbackEndpoint;
     private AuthManager $loginManager;
 
-    public function __construct(string $frontendDomain, string $frontendLoginCallbackEndpoint, AuthManager $loginManager)
+    public function __construct(string $frontendDomain, AuthManager $loginManager)
     {
         $this->frontendDomain = $frontendDomain;
-        $this->frontendLoginCallbackEndpoint = $frontendLoginCallbackEndpoint;
         $this->loginManager = $loginManager;
     }
 
@@ -75,12 +73,13 @@ final class AuthController extends AbstractController
             $token = $jwtManager->create($user);
 
             return AuthResponse::redirect(
-                $this->frontendDomain . $this->frontendLoginCallbackEndpoint,
+                $this->frontendDomain,
                 $token
             );
+
         } catch (AbstractApiException $e) {
             return $this->redirect(
-                $this->frontendDomain . $this->frontendLoginCallbackEndpoint
+                $this->frontendDomain . '/login'
                 . '?error=' . urlencode($e->getMessage() ?: 'Login failed')
             );
         }
