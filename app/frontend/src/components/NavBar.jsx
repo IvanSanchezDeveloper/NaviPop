@@ -2,10 +2,32 @@ import { useEffect, useState } from 'react';
 import { FaGithub } from 'react-icons/fa';
 import { HiOutlineMenu, HiOutlineX } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from 'react-router-dom';
+
+const navigationLinks = [
+    { to: '/', label: 'Home', isHome: true },
+    { to: '/placeholder', label: 'Placeholder' },
+    { to: '/placeholder2', label: 'Placeholder' }
+];
+
+const NavLink = ({ to, children, isHome = false, onClick }) => (
+    <Link
+        to={to}
+        onClick={onClick}
+        className={`text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] transition-colors duration-200 ${
+            isHome ? 'font-semibold' : ''
+        }`}
+    >
+        {children}
+    </Link>
+);
 
 export default function NavBar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isCompactView, setIsCompactView] = useState(false);
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const handleResize = () => {
@@ -17,6 +39,14 @@ export default function NavBar() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    const handleAuthAction = () => {
+        if (user) {
+            logout();
+        } else {
+            navigate('/login');
+        }
+    };
+
     return (
         <nav className="sticky top-0 left-0 right-0 z-50 bg-[var(--color-primary)] shadow-md backdrop-blur-sm">
             <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-8">
@@ -24,36 +54,44 @@ export default function NavBar() {
                     NAVIPop
                 </div>
 
-                {isCompactView ? (
-                    <button
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        className="absolute left-1/2 -translate-x-1/2 text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] text-3xl transition-colors duration-200 focus:outline-none">
-                        {isMenuOpen ? <HiOutlineX/> : <HiOutlineMenu/>}
-                    </button>
-                ) : (
+                {!isCompactView && (
                     <div className="absolute left-1/2 transform -translate-x-1/2 flex space-x-6 text-2xl">
-                        <Link
-                            to="/"
-                            className="text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] transition-colors duration-200 font-semibold"
-                        >
-                            Home
-                        </Link>
-                        <Link
-                            to="/placeholder"
-                            className="text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] transition-colors duration-200"
-                        >
-                            Placeholder
-                        </Link>
-                        <Link
-                            to="/placeholder2"
-                            className="text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] transition-colors duration-200"
-                        >
-                            Placeholder
-                        </Link>
+                        {navigationLinks.map((link) => (
+                            <NavLink
+                                key={link.to}
+                                to={link.to}
+                                isHome={link.isHome}
+                            >
+                                {link.label}
+                            </NavLink>
+                        ))}
                     </div>
                 )}
 
-                <div className="flex-shrink-0">
+
+                <div className="flex items-center space-x-4">
+                    {isCompactView && (
+                        <button
+                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            className="text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] text-3xl transition-colors duration-200 focus:outline-none">
+                            {isMenuOpen ? <HiOutlineX/> : <HiOutlineMenu/>}
+                        </button>
+                    )}
+
+                    {user && !isCompactView && (
+                        <span className="text-[var(--color-primaryText)] text-xl">
+                            {user.email}
+                        </span>
+                    )}
+
+                    <button
+                        onClick={handleAuthAction}
+                        className="w-25 px-4 py-2 bg-[var(--color-secondaryText)] hover:bg-[var(--color-primaryText)] text-white rounded-lg transition-colors duration-200 text-xl cursor-pointer"
+                    >
+                        {user ? 'Logout' : 'Login'}
+                    </button>
+
+
                     <a
                         href="https://github.com"
                         target="_blank"
@@ -63,33 +101,29 @@ export default function NavBar() {
                         <FaGithub/>
                     </a>
                 </div>
+
             </div>
 
             {/* Burger menu if width is too low */}
             {isCompactView && isMenuOpen && (
                 <div className="px-4 pb-4">
+                    {user && (
+                        <span className="text-[var(--color-primaryText)] text-xl mb-6 block ">
+                            {user.email}
+                        </span>
+                    )}
                     <div className="flex flex-col space-y-2 text-lg">
-                        <Link
-                            to="/"
-                            className="text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] transition-colors duration-200 font-semibold"
-                        >
-                            Home
-                        </Link>
-                        <Link
-                            to="/placeholder"
-                            className="text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] transition-colors duration-200"
-                        >
-                            Placeholder
-                        </Link>
-                        <Link
-                            to="/placeholder2"
-                            className="text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] transition-colors duration-200"
-                        >
-                            Placeholder
-                        </Link>
+                        {navigationLinks.map((link) => (
+                            <NavLink
+                                key={link.to}
+                                to={link.to}
+                                isHome={link.isHome}
+                            >
+                                {link.label}
+                            </NavLink>
+                        ))}
                     </div>
                 </div>
-
             )}
         </nav>
     );
