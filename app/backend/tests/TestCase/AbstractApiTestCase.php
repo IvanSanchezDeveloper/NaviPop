@@ -12,6 +12,7 @@ abstract class AbstractApiTestCase extends WebTestCase
     protected const GOOGLE_ID = 'google-123';
     protected const EMAIL = 'email@example.com';
     protected const PASSWORD = 'password';
+    protected const NAME = 'name';
     protected const JWT_TOKEN = 'google.jwt.token';
     protected const USER_ROLE = 'ROLE_USER';
 

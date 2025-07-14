@@ -10,6 +10,11 @@ security:
                 property: email
 
     firewalls:
+        api_public:
+            pattern: ^/api/(login|register)
+            stateless: true
+            security: false
+
         api:
             pattern: ^/api
             stateless: true

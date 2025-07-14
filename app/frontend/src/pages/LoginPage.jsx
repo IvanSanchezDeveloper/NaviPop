@@ -77,7 +77,7 @@ export default function LoginPage() {
                     />
 
                     {error && (
-                        <div className="text-sm font-medium text-secondaryText">{error}</div>
+                        <div className="text-sm font-medium text-error">{error}</div>
                     )}
 
                     <button

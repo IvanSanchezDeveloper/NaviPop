@@ -28,12 +28,25 @@ export function AuthProvider({ children }) {
             const response = await axios.post('/login',
                 { email, password }
             );
-            await checkAuth()
+            await checkAuth();
             return { success: true };
         } catch (error) {
             return {
                 success: false,
                 error: error.response?.data?.error || 'Error while loging in'
+            };
+        }
+    };
+
+    const register = async (email, password, name) => {
+        try {
+            const response = await axios.post(`/register`, { email, password, name});
+            await checkAuth();
+            return { success: true };
+        } catch (error) {
+            return {
+                success: false,
+                error: error.response?.data?.error || 'Error while registering'
             };
         }
     };
@@ -57,6 +70,7 @@ export function AuthProvider({ children }) {
         user,
         login,
         logout,
+        register,
         checkAuth
     };
 

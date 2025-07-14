@@ -2,11 +2,14 @@
 
 namespace App\Tests\Controller\Api;
 
+use App\Entity\User;
 use App\Exception\LinkGoogleAccountException;
 use App\Exception\WrongCredentialsException;
+use App\Repository\UserRepository;
 use App\Service\Auth\AuthManager;
 use App\Controller\Api\AuthController;
 use App\Tests\TestCase\AbstractApiTestCase;
+use Doctrine\ORM\EntityManagerInterface;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\OAuth2Client;
 use League\OAuth2\Client\Provider\GoogleUser;
@@ -15,6 +18,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AuthControllerTest extends AbstractApiTestCase
 {
@@ -176,5 +180,62 @@ class AuthControllerTest extends AbstractApiTestCase
             ->willReturn($googleClientMock);
 
         return $clientRegistryMock;
+    }
+
+    public function testRegisterReturnsSuccessResponse(): void
+    {
+        $userRepo = $this->createMock(UserRepository::class);
+        $userRepo->method('findOneBy')->with(['email' => self::EMAIL])->willReturn(null);
+
+        $jwtManager = $this->mockJwtManager();
+
+        $request = new Request(content: json_encode([
+            'email' => self::EMAIL,
+            'password' => self::PASSWORD,
+            'name' => self::NAME,
+        ]));
+
+        $controller = new AuthController('', $this->loginManagerMock);
+
+        $response = $controller->register(
+            $request,
+            $userRepo,
+            $jwtManager
+        );
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+
+        $cookies = $response->headers->getCookies();
+        $this->assertCount(1, $cookies);
+        $this->assertEquals('BEARER', $cookies[0]->getName());
+        $this->assertEquals(self::JWT_TOKEN, $cookies[0]->getValue());
+    }
+
+    public function testRegisterReturnsErrorForDuplicateEmail(): void
+    {
+        $existingUser = new User();
+        $existingUser->setEmail(self::EMAIL);
+
+        $userRepo = $this->createMock(UserRepository::class);
+        $userRepo->method('findOneBy')->willReturn($existingUser);
+
+        $request = new Request(content: json_encode([
+            'email' => self::EMAIL,
+            'password' => self::PASSWORD,
+            'name' => self::NAME,
+        ]));
+
+        $controller = new AuthController('', $this->loginManagerMock);
+
+        $response = $controller->register(
+            $request,
+            $userRepo,
+            $this->mockJwtManager()
+        );
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals(Response::HTTP_CONFLICT, $response->getStatusCode());
+        $this->assertEmpty($response->headers->getCookies());
     }
 }
