@@ -2,6 +2,8 @@
 
 namespace App\Exception;
 
+use Symfony\Component\HttpFoundation\Response;
+
 class UserAlreadyInUseException extends AbstractApiException implements ApiExceptionInterface
 {
     public function __construct()
@@ -11,7 +13,7 @@ class UserAlreadyInUseException extends AbstractApiException implements ApiExcep
 
     public function getStatusCode(): int
     {
-        return self::STATUS_UNAUTHORIZED;
+        return Response::HTTP_UNAUTHORIZED;
     }
 
     public function getPayload(): array

@@ -47,7 +47,7 @@ final class AuthController extends AbstractController
         } catch (AbstractApiException $e) {
             return AuthResponse::json([
                 'error' => $e->getMessage()
-            ], null, Response::HTTP_UNAUTHORIZED);
+            ], null, $e->getCode());
         }
     }
 
@@ -108,7 +108,7 @@ final class AuthController extends AbstractController
             $exception = new UserAlreadyInUseException();
             return AuthResponse::json([
                 'error' => $exception->getMessage()
-            ], null, Response::HTTP_CONFLICT);
+            ], null, $exception->getCode());
         }
 
         $user = $userRepo->createUser($email, $password);

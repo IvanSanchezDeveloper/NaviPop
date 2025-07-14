@@ -2,6 +2,8 @@
 
 namespace App\Exception;
 
+use Symfony\Component\HttpFoundation\Response;
+
 class LinkGoogleAccountException extends AbstractApiException implements ApiExceptionInterface
 {
     private string $email;
@@ -14,7 +16,7 @@ class LinkGoogleAccountException extends AbstractApiException implements ApiExce
 
     public function getStatusCode(): int
     {
-        return self::STATUS_CONFLICT;
+        return Response::HTTP_CONFLICT;
     }
 
     public function getPayload(): array
