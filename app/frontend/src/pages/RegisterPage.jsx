@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../api/axiosInstance.jsx';
 import { FcGoogle } from 'react-icons/fc';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function RegisterPage() {
     const [name, setName] = useState('');
@@ -9,16 +10,23 @@ export default function RegisterPage() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { register } = useAuth();
 
     const handleRegister = async (e) => {
         e.preventDefault();
+        setError('');
+        setIsSubmitting(true);
+
         try {
-            const { data } = await axios.post(`${backendUrl}/api/register`, { email, password, name});
-            localStorage.setItem('jwt', data.token);
-            window.location.href = '/';
-        } catch (err) {
-            const message = err?.response?.data?.message || 'Registration failed';
-            setError(message);
+            const result = await register(email, password);
+
+            if (!result.success) {
+                setError(result.error);
+            }
+
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -61,14 +69,20 @@ export default function RegisterPage() {
                     />
 
                     {error && (
-                        <div className="text-sm font-medium text-secondaryText">{error}</div>
+                        <div className="text-sm font-medium text-error">{error}</div>
                     )}
 
                     <button
                         type="submit"
                         className="w-full py-3 rounded-lg border border-gray-300 bg-white text-primaryText hover:ring-2 hover:ring-secondaryText transition"
                     >
-                        Register
+                        {isSubmitting ? (
+                            <span className="flex items-center justify-center">
+                                <div className="animate-spin h-5 w-5 border-2 border-gray-500 rounded-full border-t-transparent" />
+                            </span>
+                            ) : (
+                                'Register'
+                            )}
                     </button>
                 </form>
 

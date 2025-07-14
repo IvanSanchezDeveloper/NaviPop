@@ -3,6 +3,8 @@
 namespace App\Controller\Api;
 
 use App\Exception\AbstractApiException;
+use App\Exception\UserAlreadyInUseException;
+use App\Repository\UserRepository;
 use App\Service\Auth\AuthManager;
 use App\Service\Auth\AuthResponse;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
@@ -17,12 +19,12 @@ use Symfony\Component\Routing\Attribute\Route;
 final class AuthController extends AbstractController
 {
     private string $frontendDomain;
-    private AuthManager $loginManager;
+    private AuthManager $authManager;
 
     public function __construct(string $frontendDomain, AuthManager $loginManager)
     {
         $this->frontendDomain = $frontendDomain;
-        $this->loginManager = $loginManager;
+        $this->authManager = $loginManager;
     }
 
     #[Route('/api/login', name: 'login', methods: ['POST'])]
@@ -33,7 +35,7 @@ final class AuthController extends AbstractController
         try {
             $data = json_decode($request->getContent(), true);
 
-            $user = $this->loginManager->handleStandardLogin(
+            $user = $this->authManager->handleStandardLogin(
                 $data['email'] ?? '',
                 $data['password'] ?? ''
             );
@@ -65,7 +67,7 @@ final class AuthController extends AbstractController
     ): RedirectResponse {
         try {
             $googleUser = $clientRegistry->getClient('google')->fetchUser();
-            $user = $this->loginManager->handleGoogleLogin(
+            $user = $this->authManager->handleGoogleLogin(
                 $googleUser->getEmail(),
                 $googleUser->getId()
             );
@@ -91,4 +93,28 @@ final class AuthController extends AbstractController
         return AuthResponse::logout();
     }
 
+    #[Route('/api/register', name: 'api_register', methods: ['POST'])]
+    public function register(
+        Request $request,
+        UserRepository $userRepo,
+        JWTTokenManagerInterface $jwtManager
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+
+        $email = $data['email'];
+        $password = $data['password'];
+
+        if ($userRepo->findOneBy(['email' => $email])) {
+            $exception = new UserAlreadyInUseException();
+            return AuthResponse::json([
+                'error' => $exception->getMessage()
+            ], null, Response::HTTP_CONFLICT);
+        }
+
+        $user = $userRepo->createUser($email, $password);
+
+        $token = $jwtManager->create($user);
+
+        return AuthResponse::json([], $token);
+    }
 }
