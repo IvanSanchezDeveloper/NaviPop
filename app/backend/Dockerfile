@@ -15,7 +15,13 @@ RUN apt-get update && apt-get install -y \
         pdo_pgsql \
         zip \
         soap \
-        curl
+        curl \
+        fileinfo
+
+RUN echo "upload_max_filesize = 10M" >> /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "post_max_size = 10M" >> /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "max_file_uploads = 20" >> /usr/local/etc/php/conf.d/uploads.ini \
+    && echo "memory_limit = 256M" >> /usr/local/etc/php/conf.d/uploads.ini
 
 # Install Xdebug
 RUN pecl install xdebug && docker-php-ext-enable xdebug && \

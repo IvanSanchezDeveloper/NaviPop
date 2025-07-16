@@ -25,3 +25,7 @@ services:
         arguments:
             $frontendDomain: '%frontendDomain%'
 
+    App\Service\ProductManager:
+        arguments:
+            $imagesPath: '%imagesPath%'
+

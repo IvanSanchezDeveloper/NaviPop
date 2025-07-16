@@ -7,14 +7,10 @@ use App\Entity\Product;
 use App\Entity\User;
 use App\Exception\ImageMaxSizeExceededException;
 use App\Service\ProductManager;
-use Couchbase\RegexpSearchQuery;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class ProductControllerTest extends TestCase
 {

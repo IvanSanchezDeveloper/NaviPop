@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage.jsx';
 import HomePage from './pages/HomePage.jsx';
+import CreateProductPage from './pages/CreateProductPage.jsx';
 import RequireAuth from './components/RequireAuth.jsx'
 import PublicRoute from './components/PublicRoute';
 import AppLayout from './layouts/AppLayout.jsx'
@@ -28,6 +29,7 @@ function App() {
                       {/* Protected routes */}
                     <Route element={<RequireAuth/>}>
                         <Route path="/" element={<HomePage/>}/>
+                        <Route path="/product/new" element={<CreateProductPage/>}/>
 
                         {/* Catch all for undefined routes */}
                         <Route path="*" element={<Navigate to="/" />}/>

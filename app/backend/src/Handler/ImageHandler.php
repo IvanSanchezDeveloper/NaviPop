@@ -4,6 +4,8 @@ namespace App\Handler;
 
 use App\Exception\ImageMaxSizeExceededException;
 use App\Exception\ImageTypeNotAllowedException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImageHandler
 {
@@ -15,7 +17,8 @@ class ImageHandler
 
     private const ALLOWED_MIME_IMG_TYPES = ['image/jpeg', 'image/png'];
 
-    public static function validateImage(mixed $image): void
+
+    public static function validateImage(UploadedFile $image): void
     {
         if (!in_array($image->getMimeType(), self::ALLOWED_MIME_IMG_TYPES)) {
             throw new ImageTypeNotAllowedException();
@@ -27,22 +30,19 @@ class ImageHandler
 
     }
 
-    public static function getImageFileName(mixed $image): string
+    public static function getUniqueFileName(UploadedFile $image): string
     {
         $fileName = uniqid() . '.' . $image->guessExtension();
 
         return $fileName;
     }
 
-    public static function saveImage(mixed $image, string $uploadDir): void
+    public static function saveImage(UploadedFile $image, string $uploadDir, string $fileName): void
     {
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
 
-        $fileName = self::getImageFileName($image);
-
         $image->move($uploadDir, $fileName);
-
     }
 }

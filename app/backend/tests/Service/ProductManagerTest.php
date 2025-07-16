@@ -4,7 +4,6 @@ namespace App\Tests\Service;
 
 use App\Entity\Product;
 use App\Entity\User;
-use App\Handler\ImageHandler;
 use App\Repository\ProductRepository;
 use App\Service\ProductManager;
 use PHPUnit\Framework\TestCase;

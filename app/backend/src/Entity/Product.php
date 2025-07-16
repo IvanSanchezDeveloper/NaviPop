@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use http\Exception\InvalidArgumentException;
 
+#[ORM\Table(name: 'product', schema: 'app')]
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
 {
