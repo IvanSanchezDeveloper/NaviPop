@@ -28,29 +28,85 @@ class ProductController extends AbstractController
         Request $request,
     ): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-
         $user = $this->getUser();
-        $name = $data['name'];
-        $price = $data['price'];
+        $name = $request->request->get('name');
+        $price = $request->request->get('price');
         $uploadedFile = $request->files->get('image');
 
         try {
             $this->productManager->createProduct($user, $name, $price, $uploadedFile);
         }
         catch (AbstractApiException $e) {
-            return AuthResponse::json([
+            return new JsonResponse([
                 'error' => $e->getMessage()
-            ], null, $e->getCode());
+            ], $e->getStatusCode());
         }
         catch (\Exception $e) {
-            return AuthResponse::json([
+            return new JsonResponse([
                 'error' => $e->getMessage()
-            ], null, Response::HTTP_UNPROCESSABLE_ENTITY);
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return new JsonResponse([
 
         ], Response::HTTP_OK);
     }
+
+    #[Route('/api/products', name: 'get_products', methods: ['GET'])]
+    public function getProducts(
+        Request $request
+    ): JsonResponse
+    {
+        try {
+            $products = $this->productManager->getAllProducts();
+            $baseUrl = $request->getSchemeAndHttpHost();
+
+            $productsData = array_map(
+                fn(Product $product) => $this->productManager->formatProductData($product, $baseUrl),
+                $products
+            );
+
+            return new JsonResponse([
+                'success' => true,
+                'data' => $productsData
+            ], Response::HTTP_OK);
+
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'error' => 'Error retrieving products'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    #[Route('/api/products/{id}', name: 'get_product', methods: ['GET'])]
+    public function getProduct(
+        Request $request,
+        int $id
+    ): JsonResponse
+    {
+        try {
+            $product = $this->productManager->getProductById($id);
+            $baseUrl = $request->getSchemeAndHttpHost();
+
+            if (!$product) {
+                return new JsonResponse([
+                    'success' => false,
+                    'error' => 'Product not found'
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            return new JsonResponse([
+                'success' => true,
+                'data' => $this->productManager->formatProductData($product, $baseUrl)
+            ], Response::HTTP_OK);
+
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'error' => 'Error retrieving product'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
