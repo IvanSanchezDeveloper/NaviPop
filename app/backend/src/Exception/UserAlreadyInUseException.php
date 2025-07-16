@@ -13,7 +13,7 @@ class UserAlreadyInUseException extends AbstractApiException implements ApiExcep
 
     public function getStatusCode(): int
     {
-        return Response::HTTP_UNAUTHORIZED;
+        return Response::HTTP_CONFLICT;
     }
 
     public function getPayload(): array

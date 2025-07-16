@@ -18,7 +18,7 @@ class ProductManagerTest extends TestCase
     protected function setUp(): void
     {
         $this->productRepository = $this->createMock(ProductRepository::class);
-        $this->imagesPath = '/test/images';
+        $this->imagesPath = sys_get_temp_dir() . '/test/images';
         $this->productManager = new ProductManager($this->productRepository, $this->imagesPath);
     }
 
