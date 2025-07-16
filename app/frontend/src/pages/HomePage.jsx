@@ -1,38 +1,61 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { ProductCard, PlaceholderCard, AddProductCard } from '../components/ProductCard';
+import axios from '../api/axiosInstance.jsx';
+import { ProductCard, PlaceholderCard, AddProductCard, LoadingCard } from '../components/ProductCard';
 import Pagination from '../components/Pagination';
 
 export default function HomePage() {
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    // TODO: Load products with pagination
-    // useEffect(() => {
-    //     const fetchProducts = async () => {
-    //         try {
-    //             const { data } = await axios.get(`${backendUrl}/api/products?page=${page}&limit=7`);
-    //             setProducts(data.items || []);
-    //             setTotalPages(data.totalPages || 1);
-    //         } catch (err) {
-    //             console.error('Error fetching products:', err);
-    //         }
-    //     };
-    //     fetchProducts();
-    // }, [page]);
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const { data } = await axios.get('/products');
+
+                if (data.success) {
+                    console.log(data.data);
+                    setProducts(data.data || []);
+                    setTotalPages(1);
+                } else {
+                    setError(data.error);
+                }
+            } catch (err) {
+                setError('Error loading products');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProducts();
+    }, []);
 
     const goToAddProduct = () => {
-
+        navigate('/product/new');
     };
 
     const handlePageChange = (newPage) => setPage(newPage);
 
-    // Generate placeholder cards, temporary until I get real fixtures
-    const generatePlaceholderCards = () => {
+    const renderCards = () => {
+        if (loading) {
+            // Show loading skeleton cards
+            return (
+                <>
+                    <AddProductCard onClick={goToAddProduct} />
+                    {Array.from({ length: 7 }, (_, i) => (
+                        <LoadingCard key={`loading-${i}`} />
+                    ))}
+                </>
+            );
+        }
+
+        // Show real products and placeholders
         const placeholderCards = [];
         const totalCards = 8;
         const usedSlots = products.length + 1; // +1 for add product card
@@ -52,25 +75,30 @@ export default function HomePage() {
             );
         }
 
-        return placeholderCards;
+        return (
+            <>
+                <AddProductCard onClick={goToAddProduct} />
+                {products.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                ))}
+                {placeholderCards}
+            </>
+        );
     };
 
     return (
         <div className="relative flex flex-col min-h-full w-full px-4 pt-6 pb-6">
             <h1 className="text-2xl font-bold text-primaryText mb-6">Explore Items</h1>
 
+            {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                    {error}
+                </div>
+            )}
+
             {/* Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 place-items-start">
-                {/* Add Product Card (always first) */}
-                <AddProductCard onClick={goToAddProduct} />
-
-                {/*/!* Real Product Cards *!/*/}
-                {/*{products.map((product) => (*/}
-                {/*    <ProductCard key={product.id} product={product} />*/}
-                {/*))}*/}
-
-                {/* Placeholder Cards */}
-                {generatePlaceholderCards()}
+                {renderCards()}
             </div>
 
             {/* Pagination */}
