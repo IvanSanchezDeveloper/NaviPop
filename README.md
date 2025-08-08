@@ -78,7 +78,6 @@ Data is stored in a **PostgreSQL** database.
 
 ## 📌 Notes
 
-- The payment platform is **fake** and meant only for demonstration.
-- Firebase integration for chat is in development.
+- Next steps can be seen here: [Kanban](https://tree.taiga.io/project/navitechno-navipop/kanban)
 
 ---
