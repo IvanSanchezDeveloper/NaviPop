@@ -81,3 +81,10 @@ Data is stored in a **PostgreSQL** database.
 - Next steps can be seen here: [Kanban](https://tree.taiga.io/project/navitechno-navipop/kanban)
 
 ---
+
+## 📷 Screenshots
+
+<img width="1920" height="1080" alt="imagen" src="https://github.com/user-attachments/assets/9173b21e-48b9-4585-b8a9-a5760b59a169" />
+<img width="1920" height="1080" alt="imagen" src="https://github.com/user-attachments/assets/ce8992f1-4717-4be8-9a44-0fe9ecb1f110" />
+<img width="1920" height="1080" alt="imagen" src="https://github.com/user-attachments/assets/823d48da-bbb4-45d9-8e46-6399cef9c725" />
+
