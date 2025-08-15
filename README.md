@@ -83,3 +83,9 @@ Data is stored in a **PostgreSQL** database.
 ---
 
 ## 📷 Screenshots
+
+<img width="1920" height="1080" alt="imagen" src="https://github.com/user-attachments/assets/89d9709f-1447-45ba-9776-162afe376413" />
+<img width="1920" height="1080" alt="imagen" src="https://github.com/user-attachments/assets/62c769a5-b665-4005-ad63-38ab7038a4f1" />
+<img width="1920" height="1080" alt="imagen" src="https://github.com/user-attachments/assets/72386ff6-cced-4327-ac2c-5444cf3d4af0" />
+
+
