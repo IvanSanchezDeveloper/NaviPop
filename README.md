@@ -24,14 +24,14 @@ Data is stored in a **PostgreSQL** database.
 
 ## 🛠️ Tech Stack
 
-| Layer          | Technology                                                                                                                                                                                                                                                            |
-|----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Backend        | <img src="https://upload.wikimedia.org/wikipedia/commons/2/27/PHP-logo.svg" width="25"/> PHP, <img src="https://symfony.com/logos/symfony_black_03.png" width="25"/> Symfony, <img src="https://img.icons8.com/?size=512&id=rHpveptSuwDz&format=png" width="25"/> JWT |
-| Frontend       | <img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" width="25"/> React, <img src="https://upload.wikimedia.org/wikipedia/commons/d/d5/Tailwind_CSS_Logo.svg" width="25"/> Tailwind CSS                                                      |
-| Database       | <img src="https://upload.wikimedia.org/wikipedia/commons/2/29/Postgresql_elephant.svg" width="25"/> PostgreSQL                                                                                                                                                        |
-| Infrastructure | <img src="https://www.docker.com/wp-content/uploads/2022/03/vertical-logo-monochromatic.png" width="25"/> Docker, <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" width="25"/> GitHub Actions                                 |
-| Testing        | <img src="https://images.seeklogo.com/logo-png/44/1/phpunit-logo-png_seeklogo-440702.png" width="25"/> PHPUnit, <img src="https://cdn.brandfetch.io/idIq_kF0rb/w/400/h/400/theme/dark/icon.jpeg?c=1dxbfHSJFAPEGdCLU4o5B" width="25"/> Cypress (planned for e2e)       |
-| Other          | <img src="https://icon2.cleanpng.com/20180426/rwq/avt9jszgj.webp" width="25"/> Firebase                                                                                                                                                                               |
+| Layer          | Technology                                                                                                                                                                                                                                                                                                                                         |
+|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Backend        | <img src="https://upload.wikimedia.org/wikipedia/commons/2/27/PHP-logo.svg" width="25"/> PHP, <img src="https://e7.pngegg.com/pngimages/941/1012/png-clipart-symfony-php-software-framework-others-miscellaneous-text-thumbnail.png" width="25"/> Symfony, <img src="https://img.icons8.com/?size=512&id=rHpveptSuwDz&format=png" width="25"/> JWT |
+| Frontend       | <img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" width="25"/> React, ,<img src="https://upload.wikimedia.org/wikipedia/commons/d/d5/Tailwind_CSS_Logo.svg" width="25"/> Tailwind CSS, <img src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Vitejs-logo.svg" width="25"/> Vite                          |
+| Database       | <img src="https://upload.wikimedia.org/wikipedia/commons/2/29/Postgresql_elephant.svg" width="25"/> PostgreSQL                                                                                                                                                                                                                                     |
+| Infrastructure | <img src="https://www.docker.com/wp-content/uploads/2022/03/vertical-logo-monochromatic.png" width="25"/> Docker, <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" width="25"/> GitHub Actions                                                                                                              |
+| Testing        | <img src="https://images.seeklogo.com/logo-png/44/1/phpunit-logo-png_seeklogo-440702.png" width="25"/> PHPUnit, <img src="https://cdn.brandfetch.io/idIq_kF0rb/w/400/h/400/theme/dark/icon.jpeg?c=1dxbfHSJFAPEGdCLU4o5B" width="25"/> Cypress (planned for e2e)                                                                                    |
+| Other          | <img src="https://icon2.cleanpng.com/20180426/rwq/avt9jszgj.webp" width="25"/> Firebase                                                                                                                                                                                                                                                            |
 
 ---
 
@@ -83,8 +83,3 @@ Data is stored in a **PostgreSQL** database.
 ---
 
 ## 📷 Screenshots
-
-<img width="1920" height="1080" alt="imagen" src="https://github.com/user-attachments/assets/9173b21e-48b9-4585-b8a9-a5760b59a169" />
-<img width="1920" height="1080" alt="imagen" src="https://github.com/user-attachments/assets/ce8992f1-4717-4be8-9a44-0fe9ecb1f110" />
-<img width="1920" height="1080" alt="imagen" src="https://github.com/user-attachments/assets/823d48da-bbb4-45d9-8e46-6399cef9c725" />
-
