@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\TestCase;
+namespace App\Tests\UnitTests\TestCase;
 
 use App\Entity\User;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;

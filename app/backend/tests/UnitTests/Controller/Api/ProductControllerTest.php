@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Controller\Api;
+namespace App\Tests\UnitTests\Controller\Api;
 
 use App\Controller\Api\ProductController;
 use App\Entity\Product;

@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
 
-namespace App\Tests\Controller\Api;
+namespace App\Tests\UnitTests\Controller\Api;
 
+use App\Controller\Api\AuthController;
 use App\Entity\User;
 use App\Exception\LinkGoogleAccountException;
 use App\Exception\WrongCredentialsException;
 use App\Repository\UserRepository;
 use App\Service\Auth\AuthManager;
-use App\Controller\Api\AuthController;
-use App\Tests\TestCase\AbstractApiTestCase;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Tests\UnitTests\TestCase\AbstractApiTestCase;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\OAuth2Client;
 use League\OAuth2\Client\Provider\GoogleUser;
@@ -18,7 +17,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AuthControllerTest extends AbstractApiTestCase
 {
@@ -28,20 +26,20 @@ class AuthControllerTest extends AbstractApiTestCase
     protected const GOOGLE_LOGIN_SUCCESS_REDIRECT_URL = self::FRONTEND_URL;
     protected const GOOGLE_LOGIN_ERROR_REDIRECT_URL = self::FRONTEND_URL . '/login?error=' . 'Account+exists.+Please+link+your+Google+account.';
 
-    private AuthManager|MockObject $loginManagerMock;
+    private AuthManager|MockObject $authManagerMock;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->loginManagerMock = $this->createMock(AuthManager::class);
+        $this->authManagerMock = $this->createMock(AuthManager::class);
     }
 
     public function testLoginSuccess(): void
     {
-        $this->loginManagerMock->method('handleStandardLogin')
+        $this->authManagerMock->method('handleStandardLogin')
             ->willReturn($this->user);
 
-        $controller = new AuthController('', $this->loginManagerMock);
+        $controller = new AuthController('', $this->authManagerMock);
 
         $request = new Request([], [], [], [], [], [], json_encode([
             'email' => self::EMAIL,
@@ -61,10 +59,10 @@ class AuthControllerTest extends AbstractApiTestCase
 
     public function testLoginFailure(): void
     {
-        $this->loginManagerMock->method('handleStandardLogin')
+        $this->authManagerMock->method('handleStandardLogin')
             ->willThrowException(new WrongCredentialsException());
 
-        $controller = new AuthController('', $this->loginManagerMock);
+        $controller = new AuthController('', $this->authManagerMock);
 
         $request = new Request([], [], [], [], [], [], json_encode([
             'email' => self::EMAIL,
@@ -94,7 +92,7 @@ class AuthControllerTest extends AbstractApiTestCase
 
         $controller = new AuthController(
             self::FRONTEND_URL,
-            $this->loginManagerMock
+            $this->authManagerMock
         );
 
         $response = $controller->connectGoogle($clientRegistryMock);
@@ -105,12 +103,12 @@ class AuthControllerTest extends AbstractApiTestCase
 
     public function testConnectGoogleCheckSuccess(): void
     {
-        $this->loginManagerMock->method('handleGoogleLogin')
+        $this->authManagerMock->method('handleGoogleLogin')
             ->willReturn($this->user);
 
         $controller = new AuthController(
             self::FRONTEND_URL,
-            $this->loginManagerMock
+            $this->authManagerMock
         );
 
         $response = $controller->connectGoogleCheck(
@@ -129,12 +127,12 @@ class AuthControllerTest extends AbstractApiTestCase
 
     public function testConnectGoogleCheckFails(): void
     {
-        $this->loginManagerMock->method('handleGoogleLogin')
+        $this->authManagerMock->method('handleGoogleLogin')
             ->willThrowException(new LinkGoogleAccountException(self::EMAIL));
 
         $controller = new AuthController(
             self::FRONTEND_URL,
-            $this->loginManagerMock
+            $this->authManagerMock
         );
 
         $response = $controller->connectGoogleCheck(
@@ -149,7 +147,7 @@ class AuthControllerTest extends AbstractApiTestCase
 
     public function testLogout(): void
     {
-        $controller = new AuthController('', $this->loginManagerMock);
+        $controller = new AuthController('', $this->authManagerMock);
         $response = $controller->logout();
 
         $this->assertInstanceOf(JsonResponse::class, $response);
@@ -195,7 +193,7 @@ class AuthControllerTest extends AbstractApiTestCase
             'name' => self::NAME,
         ]));
 
-        $controller = new AuthController('', $this->loginManagerMock);
+        $controller = new AuthController('', $this->authManagerMock);
 
         $response = $controller->register(
             $request,
@@ -226,7 +224,7 @@ class AuthControllerTest extends AbstractApiTestCase
             'name' => self::NAME,
         ]));
 
-        $controller = new AuthController('', $this->loginManagerMock);
+        $controller = new AuthController('', $this->authManagerMock);
 
         $response = $controller->register(
             $request,
