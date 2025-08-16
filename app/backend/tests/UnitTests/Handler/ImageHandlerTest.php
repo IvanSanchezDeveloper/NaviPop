@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Tests\Handler;
+namespace App\Tests\UnitTests\Handler;
 
-use App\Handler\ImageHandler;
 use App\Exception\ImageMaxSizeExceededException;
 use App\Exception\ImageTypeNotAllowedException;
+use App\Handler\ImageHandler;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 

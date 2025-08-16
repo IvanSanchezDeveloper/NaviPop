@@ -1,5 +1,5 @@
 <?php
-namespace App\Tests\Service\Auth;
+namespace App\Tests\UnitTests\Service\Auth;
 
 use App\Entity\User;
 use App\Exception\GoogleLoginRequiredException;
