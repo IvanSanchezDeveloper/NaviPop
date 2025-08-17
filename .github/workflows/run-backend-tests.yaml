@@ -9,6 +9,23 @@ jobs:
   backend-tests:
     runs-on: ubuntu-latest
 
+    container:
+      image: php:8.3
+      options: --workdir /github/workspace/app/backend
+
+    services:
+      db:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: naviapp
+        options: >-
+          --health-cmd="pg_isready -U postgres -d naviapp"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     defaults:
       run:
         working-directory: app/backend
@@ -16,17 +33,56 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3'
-          coverage: none
+      - name: Install system dependencies
+        run: |
+          apt-get update && apt-get install -y \
+          zlib1g-dev \
+          libzip-dev \
+          libicu-dev \
+          libcurl4-openssl-dev \
+          libssl-dev \
+          iproute2 \
+          git unzip zip libpq-dev \
+          libxml2-dev \
+          libpng-dev \
+          libjpeg-dev \
+          libfreetype6-dev \
+          && docker-php-ext-configure gd --with-freetype --with-jpeg \
+          && docker-php-ext-install \
+          pdo \
+          pdo_pgsql \
+          zip \
+          soap \
+          curl \
+          fileinfo \
+          gd
 
-      - name: Install dependencies
+      - name: Install Composer
+        run: |
+          php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+          php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+          php -r "unlink('composer-setup.php');"
+
+      - name: Install composer dependencies
         run: composer install --no-progress --no-interaction
 
-      - name: Create .env.test
-        run: cp .env.test .env.local || true
+      - name: Create .env.local
+        run: cat .env.test > .env.local
+
+      - name: Wait for Postgres
+        run: |
+          echo "Waiting for Postgres..."
+          for i in {1..30}; do
+            pg_isready -h db -p 5432 -U postgres && break
+            echo "Postgres not ready yet..."
+            sleep 2
+          done
+
+      - name: Create database
+        run: php bin/console doctrine:database:create --if-not-exists
+
+      - name: Run migrations
+        run: php bin/console doctrine:migrations:migrate --no-interaction
 
       - name: Run PHPUnit
         run: ./vendor/bin/phpunit --testdox

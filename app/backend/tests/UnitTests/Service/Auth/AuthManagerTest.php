@@ -108,6 +108,9 @@ class AuthManagerTest extends TestCase
         $this->userRepository->method('findOneByGoogleId')->willReturn(null);
         $this->userRepository->method('findOneByEmail')->willReturn(null);
 
+        $this->em->expects($this->once())->method('persist');
+        $this->em->expects($this->once())->method('flush');
+
         $newUser = $this->loginManager->handleGoogleLogin(self::EMAIL, self::GOOGLE_ID);
 
         $this->assertNotNull($newUser);

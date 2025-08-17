@@ -13,9 +13,9 @@ class ImageHandler
 
     private const MAX_IMG_SIZE = 5 * 1024 * 1024; // 5 MB
 
-    public const ALLOWED_IMG_TYPES = ['jpeg', 'png'];
+    public const ALLOWED_IMG_TYPES = ['jpeg', 'jpg', 'png'];
 
-    private const ALLOWED_MIME_IMG_TYPES = ['image/jpeg', 'image/png'];
+    private const ALLOWED_MIME_IMG_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
 
 
     public static function validateImage(UploadedFile $image): void

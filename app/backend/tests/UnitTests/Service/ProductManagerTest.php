@@ -4,6 +4,8 @@ namespace App\Tests\UnitTests\Service;
 
 use App\Entity\Product;
 use App\Entity\User;
+use App\Exception\ImageMaxSizeExceededException;
+use App\Exception\ImageTypeNotAllowedException;
 use App\Repository\ProductRepository;
 use App\Service\ProductManager;
 use PHPUnit\Framework\TestCase;
@@ -14,6 +16,9 @@ class ProductManagerTest extends TestCase
     private ProductRepository $productRepository;
     private ProductManager $productManager;
     private string $imagesPath;
+
+    private const NOT_ALLOWED_IMG_TYPE = 'image/gif';
+    private const NOT_ALLOWED_IMG_SYZE = 6 * 1024 * 1024;
 
     protected function setUp(): void
     {
@@ -103,4 +108,30 @@ class ProductManagerTest extends TestCase
 
         $this->assertEquals($expected, $result);
     }
+
+    public function testCreateProductValidatesImage(): void
+    {
+        $user = new User();
+        $uploadedFile = $this->createMock(UploadedFile::class);
+        $uploadedFile->method('getMimeType')->willReturn(self::NOT_ALLOWED_IMG_TYPE);
+        $uploadedFile->method('getSize')->willReturn(1024);
+
+        $this->expectException(ImageTypeNotAllowedException::class);
+
+        $this->productManager->createProduct($user, 'Test', '10.00', $uploadedFile);
+    }
+
+    public function testCreateProductValidatesImageSize(): void
+    {
+        $user = new User();
+        $uploadedFile = $this->createMock(UploadedFile::class);
+        $uploadedFile->method('getMimeType')->willReturn('image/jpeg');
+        $uploadedFile->method('getSize')->willReturn(self::NOT_ALLOWED_IMG_SYZE); // 6MB > 5MB
+
+        $this->expectException(ImageMaxSizeExceededException::class);
+
+        $this->productManager->createProduct($user, 'Test', '10.00', $uploadedFile);
+    }
+
+
 }

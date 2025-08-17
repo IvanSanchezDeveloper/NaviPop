@@ -7,23 +7,22 @@ use App\Entity\Product;
 use App\Entity\User;
 use App\Exception\ImageMaxSizeExceededException;
 use App\Service\ProductManager;
+use App\Tests\UnitTests\TestCase\AbstractApiTestCase;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class ProductControllerTest extends TestCase
+class ProductControllerTest extends AbstractApiTestCase
 {
     private ProductManager $productManager;
     private ProductController $controller;
-    private User $user;
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->productManager = $this->createMock(ProductManager::class);
-
-
-        $this->user = new User();
 
         $this->controller = $this->getMockBuilder(ProductController::class)
             ->setConstructorArgs([$this->productManager])
@@ -52,7 +51,6 @@ class ProductControllerTest extends TestCase
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
     }
-
 
     public function testCreateProductHandlesImageException(): void
     {
