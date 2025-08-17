@@ -35,10 +35,6 @@ class AuthManager
             throw new GoogleLoginRequiredException();
         }
 
-        if ($email === 'navi.techno.music@gmail.com') {
-            return $user;
-        }
-
         if (!$this->passwordHasher->isPasswordValid($user, $password)) {
             throw new WrongCredentialsException();
         }

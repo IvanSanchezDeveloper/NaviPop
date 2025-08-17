@@ -185,6 +185,10 @@ class AuthControllerTest extends AbstractApiTestCase
         $userRepo = $this->createMock(UserRepository::class);
         $userRepo->method('findOneBy')->with(['email' => self::EMAIL])->willReturn(null);
 
+        $userRepo->method('createUser')
+            ->with(self::EMAIL, self::PASSWORD)
+            ->willReturn($this->user);
+
         $jwtManager = $this->mockJwtManager();
 
         $request = new Request(content: json_encode([

@@ -21,6 +21,9 @@
         <testsuite name="Unit tests">
             <directory>tests/UnitTests</directory>
         </testsuite>
+        <testsuite name="Integration tests">
+            <directory>tests/IntegrationTests</directory>
+        </testsuite>
     </testsuites>
 
     <coverage processUncoveredFiles="true">

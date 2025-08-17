@@ -10,13 +10,18 @@ RUN apt-get update && apt-get install -y \
     iproute2 \
     git unzip zip libpq-dev \
     libxml2-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install \
         pdo \
         pdo_pgsql \
         zip \
         soap \
         curl \
-        fileinfo
+        fileinfo \
+        gd
 
 RUN echo "upload_max_filesize = 10M" >> /usr/local/etc/php/conf.d/uploads.ini \
     && echo "post_max_size = 10M" >> /usr/local/etc/php/conf.d/uploads.ini \
