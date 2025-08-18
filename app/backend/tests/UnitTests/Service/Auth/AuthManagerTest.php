@@ -105,11 +105,11 @@ class AuthManagerTest extends TestCase
 
     public function testHandleGoogleLoginCreatesNewUser(): void
     {
+        $user = $this->createUserMock();
+
         $this->userRepository->method('findOneByGoogleId')->willReturn(null);
         $this->userRepository->method('findOneByEmail')->willReturn(null);
-
-        $this->em->expects($this->once())->method('persist');
-        $this->em->expects($this->once())->method('flush');
+        $this->userRepository->method('createUser')->willReturn($user);
 
         $newUser = $this->loginManager->handleGoogleLogin(self::EMAIL, self::GOOGLE_ID);
 

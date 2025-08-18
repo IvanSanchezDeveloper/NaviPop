@@ -25,11 +25,16 @@ class ProductManagerIntegrationTest extends AbstractIntegrationTestCase
     public function testCreateProductPersistsProductInDbAndSavesImage(): void
     {
         $user = $this->createTestUser();
+
         $productName = 'Integration Test Product';
         $productPrice = '25.99';
         $uploadedFile = $this->createUploadedFile();
 
+        $before = new \DateTimeImmutable('now');
+
         $this->productManager->createProduct($user, $productName, $productPrice, $uploadedFile);
+
+        $after = new \DateTimeImmutable('now');
 
         $products = $this->productRepository->findAll();
         $this->assertCount(1, $products);
@@ -39,6 +44,9 @@ class ProductManagerIntegrationTest extends AbstractIntegrationTestCase
         $this->assertEquals($productPrice, $product->getPrice());
         $this->assertEquals($user->getId(), $product->getUserSeller()->getId());
         $this->assertNotEmpty($product->getImagePath());
+        $this->assertGreaterThanOrEqual($before, $product->getCreatedAt());
+        $this->assertLessThanOrEqual($after, $product->getCreatedAt());
+
 
         $imagePath = $this->imagesPath . '/' . $product->getImagePath();
         $this->assertFileExists($imagePath);

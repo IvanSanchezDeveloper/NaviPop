@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Product;
 use App\Entity\User;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -24,6 +25,7 @@ class ProductRepository extends ServiceEntityRepository
         $product->setName($name);
         $product->setPrice($price);
         $product->setImagePath($imgPath);
+        $product->setCreatedAt(new DateTime('now'));
 
         $this->getEntityManager()->persist($product);
         $this->getEntityManager()->flush();

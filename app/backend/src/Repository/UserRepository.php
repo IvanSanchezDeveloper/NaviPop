@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -52,13 +53,24 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->getOneOrNullResult();
     }
 
-    public function createUser(string $email, string $password): User
+    public function createUser(string $email, ?string $password, ?string $googleId = null): User
     {
         $user = new User();
         $user->setEmail($email);
-        $hashedPassword = $this->passwordHasher->hashPassword($user, $password);
-        $user->setPassword($hashedPassword);
         $user->setRoles(['ROLE_USER']);
+        $user->setCreatedAt(new DateTime('now'));
+
+        if ($password !== null) {
+            $hashedPassword = $this->passwordHasher->hashPassword($user, $password);
+            $user->setPassword($hashedPassword);
+        }
+        else {
+            $user->setPassword('');
+        }
+
+        if ($googleId !== null) {
+            $user->setGoogleId($googleId);
+        }
 
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();

@@ -56,14 +56,13 @@ class AuthManager
             throw new LinkGoogleAccountException($email);
         }
 
-        $newUser = new User();
-        $newUser->setEmail($email);
-        $newUser->setGoogleId($googleId);
-        $newUser->setPassword(''); // No need password for Google accounts
-
-        $this->em->persist($newUser);
-        $this->em->flush();
+        $newUser = $this->register($email, null, $googleId);
 
         return $newUser;
+    }
+
+    public function register(string $email, ?string $password, ?string $googleId = null): User
+    {
+        return $this->userRepository->createUser($email, $password, $googleId);
     }
 }
