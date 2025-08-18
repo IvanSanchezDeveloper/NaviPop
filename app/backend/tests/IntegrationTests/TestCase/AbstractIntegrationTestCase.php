@@ -43,21 +43,14 @@ abstract class AbstractIntegrationTestCase extends WebTestCase
 
     protected function createTestUser(string $email = self::TEST_EMAIL, ?string $googleId = null): User
     {
-        $user = new User();
-        $user->setEmail($email);
+        $userRepository = $this->entityManager->getRepository(User::class);
 
-        if ($googleId) {
-            $user->setGoogleId($googleId);
-            $user->setPassword('');
-        } else {
-            $hashedPassword = $this->passwordHasher->hashPassword($user, self::TEST_PASSWORD);
-            $user->setPassword($hashedPassword);
+        $password = '';
+        if (!$googleId) {
+            $password = self::TEST_PASSWORD;
         }
 
-        $user->setRoles(['ROLE_USER']);
-
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
+        $user = $userRepository->createUser($email, $password, $googleId);
 
         return $user;
     }

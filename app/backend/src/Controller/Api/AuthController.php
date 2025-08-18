@@ -111,7 +111,7 @@ final class AuthController extends AbstractController
             ], null, $exception->getStatusCode());
         }
 
-        $user = $userRepo->createUser($email, $password);
+        $user = $this->authManager->register($email, $password);
 
         $token = $jwtManager->create($user);
 

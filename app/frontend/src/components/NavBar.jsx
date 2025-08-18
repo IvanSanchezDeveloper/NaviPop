@@ -48,8 +48,8 @@ export default function NavBar() {
     };
 
     return (
-        <nav className="sticky top-0 left-0 right-0 z-50 bg-[var(--color-primary)] shadow-md backdrop-blur-sm">
-            <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-8">
+        <nav className="bg-[var(--color-primary)] shadow-md backdrop-blur-sm">
+            <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-4">
                 <div className="text-[var(--color-primaryText)] font-bold text-4xl flex-shrink-0">
                     NAVIPop
                 </div>

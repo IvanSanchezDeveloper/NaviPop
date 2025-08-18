@@ -29,14 +29,39 @@ class AuthManagerIntegrationTest extends AbstractIntegrationTestCase
         $newGoogleId = 'new_google_123';
         $newEmail = 'newgoogle@test.com';
 
+        $before = new \DateTimeImmutable('now');
+
         $createdUser = $this->authManager->handleGoogleLogin($newEmail, $newGoogleId);
+
+        $after = new \DateTimeImmutable('now');
 
         $this->assertEquals($newEmail, $createdUser->getEmail());
         $this->assertEquals($newGoogleId, $createdUser->getGoogleId());
         $this->assertEquals('', $createdUser->getPassword());
+        $this->assertGreaterThanOrEqual($before, $createdUser->getCreatedAt());
+        $this->assertLessThanOrEqual($after, $createdUser->getCreatedAt());
 
         $userFromDb = $this->userRepository->findOneByEmail($newEmail);
         $this->assertNotNull($userFromDb);
         $this->assertEquals($newGoogleId, $userFromDb->getGoogleId());
+    }
+
+    public function testRegisterCreatesNewUserIsPersistedToDb(): void
+    {
+        $newEmail = 'newgoogle@test.com';
+
+        $before = new \DateTimeImmutable('now');
+
+        $createdUser = $this->authManager->register($newEmail, null);
+
+        $after = new \DateTimeImmutable('now');
+
+        $this->assertEquals($newEmail, $createdUser->getEmail());
+        $this->assertEquals('', $createdUser->getPassword());
+        $this->assertGreaterThanOrEqual($before, $createdUser->getCreatedAt());
+        $this->assertLessThanOrEqual($after, $createdUser->getCreatedAt());
+
+        $userFromDb = $this->userRepository->findOneByEmail($newEmail);
+        $this->assertNotNull($userFromDb);
     }
 }

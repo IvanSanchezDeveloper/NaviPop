@@ -8,11 +8,11 @@ export default function AppLayout() {
 
     return (
         <div className="grid min-h-screen grid-rows-[auto_1fr_auto] bg-white text-[var(--color-primaryText)]">
-            <header>
+            <header className="sticky top-0 z-50">
                 <NavBar />
             </header>
 
-            <main className="flex items-center justify-center overflow-auto px-4">
+            <main className="flex items-center justify-center px-4">
                 <div className="w-full max-w-7xl">
                     {isLoading ? <Loading /> : <Outlet />}
                 </div>
