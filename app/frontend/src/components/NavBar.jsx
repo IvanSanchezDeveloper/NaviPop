@@ -84,12 +84,14 @@ export default function NavBar() {
                         </span>
                     )}
 
-                    <button
-                        onClick={handleAuthAction}
-                        className="w-25 px-4 py-2 bg-[var(--color-secondaryText)] hover:bg-[var(--color-primaryText)] text-white rounded-lg transition-colors duration-200 text-xl cursor-pointer"
-                    >
-                        {user ? 'Logout' : 'Login'}
-                    </button>
+                    {!isCompactView && (
+                        <button
+                            onClick={handleAuthAction}
+                            className="w-25 px-4 py-2 bg-[var(--color-secondaryText)] hover:bg-[var(--color-primaryText)] text-white rounded-lg transition-colors duration-200 text-xl cursor-pointer"
+                        >
+                            {user ? 'Logout' : 'Login'}
+                        </button>
+                    )}
 
 
                     <a
@@ -108,10 +110,16 @@ export default function NavBar() {
             {isCompactView && isMenuOpen && (
                 <div className="px-4 pb-4">
                     {user && (
-                        <span className="text-[var(--color-primaryText)] text-xl mb-6 block ">
+                        <span className="text-[var(--color-primaryText)] text-xl mb-4 block ">
                             {user.email}
                         </span>
                     )}
+                    <button
+                        onClick={handleAuthAction}
+                        className="w-25 px-4 py-2 bg-[var(--color-secondaryText)] hover:bg-[var(--color-primaryText)] text-white rounded-lg transition-colors duration-200 text-xl cursor-pointer mb-4"
+                    >
+                        {user ? 'Logout' : 'Login'}
+                    </button>
                     <div className="flex flex-col space-y-2 text-lg">
                         {navigationLinks.map((link) => (
                             <NavLink
