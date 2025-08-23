@@ -84,8 +84,9 @@ Data is stored in a **PostgreSQL** database.
 
 ## 📷 Screenshots
 
-<img width="1920" height="1080" alt="imagen" src="https://github.com/user-attachments/assets/89d9709f-1447-45ba-9776-162afe376413" />
-<img width="1920" height="1080" alt="imagen" src="https://github.com/user-attachments/assets/62c769a5-b665-4005-ad63-38ab7038a4f1" />
-<img width="1920" height="1080" alt="imagen" src="https://github.com/user-attachments/assets/72386ff6-cced-4327-ac2c-5444cf3d4af0" />
+<img width="1920" height="1080" alt="imagen" src="https://github.com/user-attachments/assets/757a4e79-5770-4aab-bce5-5b7c7797e840" />
+<img width="1920" height="1080" alt="imagen" src="https://github.com/user-attachments/assets/023bbf89-4cf8-4028-878a-3baf3e45cfeb" />
+<img width="1920" height="1080" alt="imagen" src="https://github.com/user-attachments/assets/f499bb38-6ed5-4c5f-b0a3-098b6821b25e" />
+<img width="1920" height="1080" alt="imagen" src="https://github.com/user-attachments/assets/18bfeb61-2f22-4eb7-9e02-9909ddf63e96" />
 
 
