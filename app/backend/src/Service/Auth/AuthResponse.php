@@ -13,11 +13,14 @@ class AuthResponse
 
     public static function createJWTCookie(string $token): Cookie
     {
-        return new Cookie(
+        return Cookie::create(
             self::JWT_COOKIE_NAME,
             $token,
             new \DateTime('+1 month')
-        );
+        )
+        ->withSecure(true)
+        ->withHttpOnly(true)
+        ->withSameSite('None');
     }
     public static function json(array $data, ?string $token = null, int $status = self::HTTP_OK): JsonResponse
     {
