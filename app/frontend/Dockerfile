@@ -9,5 +9,7 @@ COPY . .
 
 EXPOSE 3000
 
-# Do nothing
-CMD ["tail", "-f", "/dev/null"]
+RUN chmod +x ./build-env.sh
+
+CMD ["./build-env.sh"]
+

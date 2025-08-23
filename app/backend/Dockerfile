@@ -50,6 +50,8 @@ RUN curl -sS https://get.symfony.com/cli/installer | bash && \
 # Copy project files
 COPY . .
 
+RUN chmod +x ./build-env.sh
+
 EXPOSE 8000 9003
 
-CMD ["tail", "-f", "/dev/null"]
+CMD ["./build-env.sh"]
