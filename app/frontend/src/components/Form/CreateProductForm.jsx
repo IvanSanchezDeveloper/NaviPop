@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
 import {useNavigate} from "react-router-dom";
 import axios from '../../api/axiosInstance.jsx'
 
@@ -115,7 +114,6 @@ export default function ProductForm() {
             setError('');
             setImage(file);
 
-            // Create preview URL
             const reader = new FileReader();
             reader.onload = (e) => {
                 setImagePreview(e.target.result);
@@ -211,7 +209,6 @@ export default function ProductForm() {
                     >
                         {image ? (
                             <>
-                                {/* X button - sin fondo, usando color error */}
                                 <button
                                     type="button"
                                     onClick={(e) => {

@@ -1,11 +1,10 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage.jsx';
 import HomePage from './pages/HomePage.jsx';
+import ProductViewPage from './pages/ProductViewPage.jsx'
 import CreateProductPage from './pages/CreateProductPage.jsx';
 import RequireAuth from './components/RequireAuth.jsx'
 import PublicRoute from './components/PublicRoute';
@@ -30,6 +29,7 @@ function App() {
                     <Route element={<RequireAuth/>}>
                         <Route path="/" element={<HomePage/>}/>
                         <Route path="/product/new" element={<CreateProductPage/>}/>
+                        <Route path="/product/:id" element={<ProductViewPage />} />
 
                         {/* Catch all for undefined routes */}
                         <Route path="*" element={<Navigate to="/" />}/>

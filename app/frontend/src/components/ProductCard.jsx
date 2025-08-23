@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 export function LoadingCard() {
     return (
         <div className="h-[240px] w-full bg-white rounded-xl shadow-2xl p-4 flex flex-col animate-pulse">
@@ -7,12 +9,10 @@ export function LoadingCard() {
             </div>
 
             <div className="h-4 bg-gray-200 rounded mb-2"></div>
-
             <div className="h-4 bg-gray-200 rounded w-1/3 mt-auto"></div>
         </div>
     );
 }
-
 
 export function PlaceholderCard({ type = 'content' }) {
     if (type === 'empty') {
@@ -48,10 +48,22 @@ export function AddProductCard({ onClick }) {
 }
 
 export function ProductCard({ product }) {
+    const navigate = useNavigate();
+
+    const goToProduct = () => {
+        navigate(`/product/${product.id}`);
+    };
+
     return (
-        <div className="h-[240px] w-full bg-white rounded-xl shadow-2xl p-4 flex flex-col hover:-translate-y-1 hover:shadow-[0_10px_25px_rgba(0,0,0,0.15)] active:translate-y-0 active:shadow-lg transition-all duration-200 cursor-pointer">
+        <div
+            onClick={goToProduct}
+            className="h-[240px] w-full bg-white rounded-xl shadow-2xl p-4 flex flex-col
+                       hover:-translate-y-1 hover:shadow-[0_10px_25px_rgba(0,0,0,0.15)]
+                       active:translate-y-0 active:shadow-lg
+                       transition-all duration-200 cursor-pointer"
+        >
             <img
-                src={product.image || '/react.svg'}
+                src={product.image || "/react.svg"}
                 alt={product.name}
                 className="h-2/3 w-full object-cover rounded-md mb-2"
             />
