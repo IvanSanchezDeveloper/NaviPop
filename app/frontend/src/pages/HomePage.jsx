@@ -90,28 +90,23 @@ export default function HomePage() {
     };
 
     return (
-        <div className="flex flex-col h-full w-full px-4 pt-6 pb-6">
-            <div className="px-4 pt-6 pb-6">
-                <h1 className="text-2xl font-bold text-primaryText mb-6">Explore Items</h1>
-
-                {error && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-                        {error}
-                    </div>
-                )}
-
-                {/* Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 place-items-start">
-                    {renderCards()}
+        <div className="flex flex-col h-full w-full px-4 pt-6 pb-6 justify-center">
+            <h1 className="text-2xl font-bold text-primaryText mb-6">Explore Items</h1>
+            {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                    {error}
                 </div>
-
-                {/* Pagination */}
-                <Pagination
-                    page={page}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                />
+            )}
+            {/* Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 place-items-start">
+                {renderCards()}
             </div>
+            {/* Pagination */}
+            <Pagination
+                page={page}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+            />
         </div>
     );
 }
