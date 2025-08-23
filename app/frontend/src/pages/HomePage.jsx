@@ -8,19 +8,18 @@ export default function HomePage() {
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const [loading, setLoading] = useState(true);
+    const [cardsLoading, setCardsLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                setLoading(true);
+                setCardsLoading(true);
                 setError(null);
                 const { data } = await axios.get('/products');
 
                 if (data.success) {
-                    console.log(data.data);
                     setProducts(data.data || []);
                     setTotalPages(1);
                 } else {
@@ -29,7 +28,7 @@ export default function HomePage() {
             } catch (err) {
                 setError('Error loading products');
             } finally {
-                setLoading(false);
+                setCardsLoading(false);
             }
         };
 
@@ -40,10 +39,14 @@ export default function HomePage() {
         navigate('/product/new');
     };
 
+    const goToProduct = () => {
+        navigate(`/product/${product.id}`);
+    };
+
     const handlePageChange = (newPage) => setPage(newPage);
 
     const renderCards = () => {
-        if (loading) {
+        if (cardsLoading) {
             // Show loading skeleton cards
             return (
                 <>
@@ -87,26 +90,28 @@ export default function HomePage() {
     };
 
     return (
-        <div className="relative flex flex-col min-h-full w-full px-4 pt-6 pb-6">
-            <h1 className="text-2xl font-bold text-primaryText mb-6">Explore Items</h1>
+        <div className="flex flex-col h-full w-full px-4 pt-6 pb-6">
+            <div className="px-4 pt-6 pb-6">
+                <h1 className="text-2xl font-bold text-primaryText mb-6">Explore Items</h1>
 
-            {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-                    {error}
+                {error && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                        {error}
+                    </div>
+                )}
+
+                {/* Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 place-items-start">
+                    {renderCards()}
                 </div>
-            )}
 
-            {/* Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 place-items-start">
-                {renderCards()}
+                {/* Pagination */}
+                <Pagination
+                    page={page}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                />
             </div>
-
-            {/* Pagination */}
-            <Pagination
-                page={page}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-            />
         </div>
     );
 }
