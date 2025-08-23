@@ -6,3 +6,4 @@ knpu_oauth2_client:
             client_secret: '%env(GOOGLE_CLIENT_SECRET)%'
             redirect_route: connect_google_validation
             redirect_params: {}
+            redirect_scheme: https
