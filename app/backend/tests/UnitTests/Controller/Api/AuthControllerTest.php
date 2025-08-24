@@ -13,6 +13,7 @@ use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\OAuth2Client;
 use League\OAuth2\Client\Provider\GoogleUser;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,8 +24,7 @@ class AuthControllerTest extends AbstractApiTestCase
     protected const FRONTEND_URL = 'http://frontend.test';
     protected const LOGIN_ENDPOINT = '/api/login';
     protected const GOOGLE_REDIRECT_URL = 'https://accounts.google.com/o/oauth2/auth';
-    protected const GOOGLE_LOGIN_SUCCESS_REDIRECT_URL = self::FRONTEND_URL;
-    protected const GOOGLE_LOGIN_ERROR_REDIRECT_URL = self::FRONTEND_URL . '/login?error=' . 'Account+exists.+Please+link+your+Google+account.';
+    protected const ONE_TIME_CODE = 'test1234';
 
     private AuthManager|MockObject $authManagerMock;
 
@@ -95,7 +95,9 @@ class AuthControllerTest extends AbstractApiTestCase
             $this->authManagerMock
         );
 
-        $response = $controller->connectGoogle($clientRegistryMock);
+        $request = new Request();
+
+        $response = $controller->connectGoogle($clientRegistryMock, $request);
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertEquals(self::GOOGLE_REDIRECT_URL, $response->getTargetUrl());
@@ -113,22 +115,22 @@ class AuthControllerTest extends AbstractApiTestCase
 
         $response = $controller->connectGoogleCheck(
             $this->mockClientRegistry($this->mockGoogleUser()),
-            $this->mockJwtManager()
+            $this->mockJwtManager(),
+            $this->mockCache()
         );
 
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertEquals(self::GOOGLE_LOGIN_SUCCESS_REDIRECT_URL, $response->getTargetUrl());
+        $this->assertInstanceOf(Response::class, $response);
+        $content = $response->getContent();
 
-        $cookies = $response->headers->getCookies();
-        $this->assertCount(1, $cookies);
-        $this->assertEquals('BEARER', $cookies[0]->getName());
-        $this->assertEquals(self::JWT_TOKEN, $cookies[0]->getValue());
+        $this->assertStringContainsString('Login Successful', $content);
+        $this->assertStringContainsString('oneTimeCode', $content);
     }
 
     public function testConnectGoogleCheckFails(): void
     {
+        $exception = new LinkGoogleAccountException('');
         $this->authManagerMock->method('handleGoogleLogin')
-            ->willThrowException(new LinkGoogleAccountException(self::EMAIL));
+            ->willThrowException($exception);
 
         $controller = new AuthController(
             self::FRONTEND_URL,
@@ -137,12 +139,65 @@ class AuthControllerTest extends AbstractApiTestCase
 
         $response = $controller->connectGoogleCheck(
             $this->mockClientRegistry($this->mockGoogleUser()),
-            $this->mockJwtManager()
+            $this->mockJwtManager(),
+            $this->mockCache()
         );
 
-        $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertEquals(self::GOOGLE_LOGIN_ERROR_REDIRECT_URL, $response->getTargetUrl());
-        $this->assertEmpty($response->headers->getCookies());
+        $this->assertInstanceOf(Response::class, $response);
+        $content = $response->getContent();
+
+        $this->assertStringContainsString('Login Error', $content);
+        $this->assertStringContainsString($exception->getMessage(), $content);
+    }
+
+
+    public function testSetGoogleLoginCookieWithNoCode(): void
+    {
+        $controller = new AuthController(
+            self::FRONTEND_URL,
+            $this->authManagerMock
+        );
+
+        $request = new Request([], [], [], [], [], [], json_encode([]));
+        $response = $controller->setGoogleLoginCookie($request, $this->mockCache());
+
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertStringContainsString('Unexpected error', $response->getContent());
+    }
+
+    public function testSetGoogleLoginCookieWithExpiredCode(): void
+    {
+        $controller = new AuthController(
+            self::FRONTEND_URL,
+            $this->authManagerMock
+        );
+
+        $request = new Request([], [], [], [], [], [], json_encode(['oneTimeCode' => 'expired']));
+        $response = $controller->setGoogleLoginCookie($request, $this->mockCache());
+
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertStringContainsString('Session expired', $response->getContent());
+    }
+
+    public function testSetGoogleLoginCookieSucceeds(): void
+    {
+        $controller = new AuthController(
+            self::FRONTEND_URL,
+            $this->authManagerMock
+        );
+
+        $cache = $this->mockCache(self::JWT_TOKEN, self::ONE_TIME_CODE);
+
+        $request = new Request([], [], [], [], [], [], json_encode(['oneTimeCode' => self::ONE_TIME_CODE]));
+        $response = $controller->setGoogleLoginCookie($request, $cache);
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+
+        $cookies = $response->headers->getCookies();
+        $this->assertCount(1, $cookies);
+        $this->assertEquals('BEARER', $cookies[0]->getName());
+        $this->assertEquals(self::JWT_TOKEN, $cookies[0]->getValue());
     }
 
     public function testLogout(): void

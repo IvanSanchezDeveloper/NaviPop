@@ -5,10 +5,12 @@ namespace App\Service\Auth;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class AuthResponse
 {
     private const JWT_COOKIE_NAME = 'BEARER';
+    private const COOKIE_SAME_SITE = 'None';
     private const HTTP_OK = 200;
 
     public static function createJWTCookie(string $token): Cookie
@@ -20,12 +22,23 @@ class AuthResponse
         )
         ->withSecure(true)
         ->withHttpOnly(true)
-        ->withSameSite('None');
+        ->withSameSite(self::COOKIE_SAME_SITE);
     }
 
     public static function json(array $data, ?string $token = null, int $status = self::HTTP_OK): JsonResponse
     {
         $response = new JsonResponse($data, $status);
+
+        if ($token) {
+            $response->headers->setCookie(self::createJWTCookie($token));
+        }
+
+        return $response;
+    }
+
+    public static function html(string $html, ?string $token = null, int $status = self::HTTP_OK): Response
+    {
+        $response = new Response($html, $status);
 
         if ($token) {
             $response->headers->setCookie(self::createJWTCookie($token));
@@ -44,7 +57,7 @@ class AuthResponse
             null,   // domain
             true,   // secure
             true,   // httpOnly
-            'None'  // sameSite
+            self::COOKIE_SAME_SITE  // sameSite
         );
 
         return $response;

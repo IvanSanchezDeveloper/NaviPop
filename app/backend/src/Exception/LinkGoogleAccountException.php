@@ -11,7 +11,7 @@ class LinkGoogleAccountException extends AbstractApiException implements ApiExce
     public function __construct(string $email)
     {
         parent::__construct($this->getStatusCode(), 'Account exists. Please link your Google account.');
-        $this->email    = $email;
+        $this->email = $email;
     }
 
     public function getStatusCode(): int

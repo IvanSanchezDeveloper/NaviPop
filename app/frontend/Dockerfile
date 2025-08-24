@@ -11,5 +11,6 @@ EXPOSE 3000
 
 RUN chmod +x ./build-env.sh
 
-CMD ["./build-env.sh"]
+ENTRYPOINT ["./build-env.sh"]
+CMD ["sh", "-c", "npm run dev -- --host --port 3000"]
 

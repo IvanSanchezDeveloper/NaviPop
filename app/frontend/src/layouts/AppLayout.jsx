@@ -13,7 +13,7 @@ export default function AppLayout() {
             </header>
 
             <main className="flex items-center justify-center px-4">
-                <div className="w-full h-full max-w-7xl relative">
+                <div className="w-full h-full relative">
                     <Outlet />
                     {isLoading && (
                         <div className="absolute inset-0 flex justify-center items-center bg-white z-40">

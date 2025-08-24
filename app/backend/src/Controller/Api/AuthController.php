@@ -16,17 +16,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
 
 final class AuthController extends AbstractController
 {
     private string $frontendDomain;
     private AuthManager $authManager;
 
-    public function __construct(string $frontendDomain, AuthManager $loginManager)
+    public function __construct(string $frontendDomain, AuthManager $authManager)
     {
         $this->frontendDomain = $frontendDomain;
-        $this->authManager = $loginManager;
+        $this->authManager = $authManager;
     }
 
     #[Route('/api/login', name: 'login', methods: ['POST'])]
@@ -57,9 +56,11 @@ final class AuthController extends AbstractController
     #[Route('/api/login/google', name: 'connect_google')]
     public function connectGoogle(ClientRegistry $clientRegistry): RedirectResponse
     {
-        return $clientRegistry->getClient('google')->redirect([
-            'email', 'profile'
-        ]);
+        $client = $clientRegistry->getClient('google');
+
+        return $client->redirect(
+            ['email', 'profile'],
+        );
     }
 
     #[Route('/api/login/google/check', name: 'connect_google_validation')]
@@ -77,47 +78,30 @@ final class AuthController extends AbstractController
 
             $token = $jwtManager->create($user);
 
-            $authCode = bin2hex(random_bytes(16));
+            $authCode = $this->authManager->generateGoogleAuthCode($cache, $token);
 
-            $cache->get($authCode, function (ItemInterface $item) use ($token) {
-                $item->expiresAfter(60); // 1 minute
-                return $token;
-            });
+            $html = AuthManager::buildAuthHtml(
+                'Login Successful',
+                'Finishing login...',
+                ['success' => true, 'oneTimeCode' => $authCode],
+                'Login successful. You can close this window.',
+                $this->frontendDomain
+            );
 
-            $html = <<<HTML
-                <html>
-                    <head>
-                      <title>Login Successful</title>
-                      <script>
-                        window.onload = function () {
-                          window.opener?.postMessage(
-                            { oneTimeCode: "$authCode" },
-                            "$this->frontendDomain"
-                          );
-
-                          try {
-                            window.close();
-                          } catch (e) {
-                                                  
-                            document.body.innerHTML =
-                              "<p>Login successful. You can close this window.</p>";
-                          }
-                        };
-                      </script>
-                    </head>
-                    <body>
-                      <p>Finishing login...</p>
-                    </body>
-                </html>
-            HTML;
-
-            return new Response($html);
+            return AuthResponse::html($html);
 
         } catch (AbstractApiException $e) {
-            return $this->redirect(
-                $this->frontendDomain . '/login'
-                . '?error=' . urlencode($e->getMessage() ?: 'Login failed')
+            $error = $e->getMessage();
+
+            $html = AuthManager::buildAuthHtml(
+                'Login Error',
+                'Error during login...',
+                ['error' => $error ],
+                "Login failed: {$e->getMessage()}",
+                $this->frontendDomain
             );
+
+            return AuthResponse::html($html);
         }
     }
 
@@ -128,13 +112,13 @@ final class AuthController extends AbstractController
         $code = $data['oneTimeCode'] ?? null;
 
         if (!$code) {
-            return new JsonResponse(['error' => 'Missing code'], 400);
+            return AuthResponse::json(['error' => 'Unexpected error'], null, RESPONSE::HTTP_BAD_REQUEST);
         }
 
         $token = $cache->getItem($code)->get();
 
         if (!$token) {
-            return new JsonResponse(['error' => 'Invalid or expired code'], 400);
+            return AuthResponse::json(['error' => 'Session expired'], null, RESPONSE::HTTP_BAD_REQUEST);
         }
 
         $cache->deleteItem($code);

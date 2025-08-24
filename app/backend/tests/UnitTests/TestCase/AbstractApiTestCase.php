@@ -6,6 +6,9 @@ use App\Entity\User;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 abstract class AbstractApiTestCase extends WebTestCase
 {
@@ -40,5 +43,16 @@ abstract class AbstractApiTestCase extends WebTestCase
         $jwtManagerMock = $this->createMock(JWTTokenManagerInterface::class);
         $jwtManagerMock->method('create')->willReturn($token);
         return $jwtManagerMock;
+    }
+
+    protected function mockCache(?string $item = null, string $key = ''): CacheInterface
+    {
+        $cache = new ArrayAdapter();
+
+        if($item) {
+            $cache->save($cache->getItem($key)->set($item));
+        }
+
+        return $cache;
     }
 }

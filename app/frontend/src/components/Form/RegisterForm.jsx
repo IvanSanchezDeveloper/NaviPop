@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
 import { useAuth } from '../../contexts/AuthContext';
+import { useGoogleAuth } from "../../hooks/useGoogleAuth";
 
 export default function RegisterForm() {
     const [name, setName] = useState('');
@@ -11,6 +12,7 @@ export default function RegisterForm() {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { register } = useAuth();
+    const { startGoogleAuth } = useGoogleAuth(backendUrl, setError);
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -29,30 +31,7 @@ export default function RegisterForm() {
         }
     };
     const handleGoogleRegister = () => {
-        const popup = window.open(
-            `${backendUrl}/api/login/google`,
-            "googleLogin",
-            "width=500,height=600"
-        );
-
-        const listener = async (event) => {
-            if (event.origin !== backendUrl) return;
-
-            if (event.data?.oneTimeCode) {
-                const result = await setGoogleLoginCookie(event.data?.oneTimeCode);
-
-                if (!result.success) {
-                    setError(result.error);
-                }
-
-            } else if (event.data?.error) {
-                setError(event.data?.error);
-            }
-
-            window.removeEventListener("message", listener);
-        };
-
-        window.addEventListener("message", listener);
+        startGoogleAuth();
     };
 
     return (

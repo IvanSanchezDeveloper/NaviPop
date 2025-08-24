@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
 import { useAuth } from '../../contexts/AuthContext';
+import { useGoogleAuth } from "../../hooks/useGoogleAuth";
 
 export default function LoginForm() {
     const [email, setEmail] = useState('');
@@ -11,6 +12,7 @@ export default function LoginForm() {
     const { login, setGoogleLoginCookie } = useAuth();
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const [searchParams] = useSearchParams();
+    const { startGoogleAuth } = useGoogleAuth(backendUrl, setError);
 
     useEffect(() => {
         const errorParam = searchParams.get('error');
@@ -41,30 +43,7 @@ export default function LoginForm() {
     };
 
     const handleGoogleLogin = () => {
-        const popup = window.open(
-            `${backendUrl}/api/login/google`,
-            "googleLogin",
-            "width=500,height=600"
-        );
-
-        const listener = async (event) => {
-            if (event.origin !== backendUrl) return;
-
-            if (event.data?.oneTimeCode) {
-                const result = await setGoogleLoginCookie(event.data?.oneTimeCode);
-
-                if (!result.success) {
-                    setError(result.error);
-                }
-
-            } else if (event.data?.error) {
-                setError(event.data?.error);
-            }
-
-            window.removeEventListener("message", listener);
-        };
-
-        window.addEventListener("message", listener);
+        startGoogleAuth();
     };
 
     return (

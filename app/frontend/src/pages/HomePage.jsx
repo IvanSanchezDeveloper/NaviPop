@@ -90,7 +90,7 @@ export default function HomePage() {
     };
 
     return (
-        <div className="flex flex-col h-full w-full px-4 pt-6 pb-6 justify-center">
+        <div className="flex flex-col h-full w-full max-w-7xl mx-auto px-4 pt-6 pb-6 justify-center">
             <h1 className="text-2xl font-bold text-primaryText mb-6">Explore Items</h1>
             {error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
