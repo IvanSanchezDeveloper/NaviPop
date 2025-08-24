@@ -22,6 +22,7 @@ class AuthResponse
         ->withHttpOnly(true)
         ->withSameSite('None');
     }
+
     public static function json(array $data, ?string $token = null, int $status = self::HTTP_OK): JsonResponse
     {
         $response = new JsonResponse($data, $status);
@@ -37,7 +38,14 @@ class AuthResponse
     {
         $response = new JsonResponse([], $status);
 
-        $response->headers->clearCookie(self::JWT_COOKIE_NAME);
+        $response->headers->clearCookie(
+            self::JWT_COOKIE_NAME,
+            '/',    // path
+            null,   // domain
+            true,   // secure
+            true,   // httpOnly
+            'None'  // sameSite
+        );
 
         return $response;
     }

@@ -16,7 +16,7 @@ export default function AppLayout() {
                 <div className="w-full h-full max-w-7xl relative">
                     <Outlet />
                     {isLoading && (
-                        <div className="absolute inset-0 flex justify-center items-center bg-white z-50">
+                        <div className="absolute inset-0 flex justify-center items-center bg-white z-40">
                             <Loading />
                         </div>
                     )}

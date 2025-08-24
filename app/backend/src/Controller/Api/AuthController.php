@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 final class AuthController extends AbstractController
 {
@@ -63,7 +65,8 @@ final class AuthController extends AbstractController
     #[Route('/api/login/google/check', name: 'connect_google_validation')]
     public function connectGoogleCheck(
         ClientRegistry $clientRegistry,
-        JWTTokenManagerInterface $jwtManager
+        JWTTokenManagerInterface $jwtManager,
+        CacheInterface $cache,
     ): Response {
         try {
             $googleUser = $clientRegistry->getClient('google')->fetchUser();
@@ -74,27 +77,69 @@ final class AuthController extends AbstractController
 
             $token = $jwtManager->create($user);
 
+            $authCode = bin2hex(random_bytes(16));
+
+            $cache->get($authCode, function (ItemInterface $item) use ($token) {
+                $item->expiresAfter(60); // 1 minute
+                return $token;
+            });
 
             $html = <<<HTML
-                <!DOCTYPE html>
-                <html lang="en">
-                <head><meta charset="UTF-8"><title>Login Success</title></head>
-                <body>
-                <script>
-                  window.opener.postMessage({ token: "$token" }, "$this->frontendDomain");
-                  window.close();
-                </script>
-                <p>Logging in...</p>
-                </body>
-                </html>
-                HTML;
+                <html>
+                    <head>
+                      <title>Login Successful</title>
+                      <script>
+                        window.onload = function () {
+                          window.opener?.postMessage(
+                            { oneTimeCode: "$authCode" },
+                            "$this->frontendDomain"
+                          );
 
-            return new Response($html, 200, ['Content-Type' => 'text/html']);
+                          try {
+                            window.close();
+                          } catch (e) {
+                                                  
+                            document.body.innerHTML =
+                              "<p>Login successful. You can close this window.</p>";
+                          }
+                        };
+                      </script>
+                    </head>
+                    <body>
+                      <p>Finishing login...</p>
+                    </body>
+                </html>
+            HTML;
+
+            return new Response($html);
 
         } catch (AbstractApiException $e) {
-            $errorMessage = urlencode($e->getMessage() ?: 'Login failed');
-            return $this->redirect("{$this->frontendDomain}/login?error={$errorMessage}");
+            return $this->redirect(
+                $this->frontendDomain . '/login'
+                . '?error=' . urlencode($e->getMessage() ?: 'Login failed')
+            );
         }
+    }
+
+    #[Route('/api/login/google/cookie', methods: ['POST'], name: 'connect_google_cookie')]
+    public function setGoogleLoginCookie(Request $request, CacheInterface $cache): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $code = $data['oneTimeCode'] ?? null;
+
+        if (!$code) {
+            return new JsonResponse(['error' => 'Missing code'], 400);
+        }
+
+        $token = $cache->getItem($code)->get();
+
+        if (!$token) {
+            return new JsonResponse(['error' => 'Invalid or expired code'], 400);
+        }
+
+        $cache->deleteItem($code);
+
+        return AuthResponse::json([], $token);
     }
 
     #[Route('/api/logout', name: 'api_logout', methods: ['POST'])]

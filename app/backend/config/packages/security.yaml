@@ -23,7 +23,8 @@ security:
                 authenticator: lexik_jwt_authentication.security.jwt_authenticator
 
     access_control:
-        - { path: ^/api/login,              roles: PUBLIC_ACCESS }
-        - { path: ^/api/login/google,       roles: PUBLIC_ACCESS }
-        - { path: ^/api/register,           roles: PUBLIC_ACCESS }
-        - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/login,                      roles: PUBLIC_ACCESS }
+        - { path: ^/api/login/google,               roles: PUBLIC_ACCESS }
+        - { path: ^/api/login/google/cookie,        roles: PUBLIC_ACCESS }
+        - { path: ^/api/register,                   roles: PUBLIC_ACCESS }
+        - { path: ^/api,                            roles: IS_AUTHENTICATED_FULLY }

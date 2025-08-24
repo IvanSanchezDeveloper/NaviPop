@@ -8,7 +8,7 @@ export default function LoginForm() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { login } = useAuth();
+    const { login, setGoogleLoginCookie } = useAuth();
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     const [searchParams] = useSearchParams();
 
@@ -41,29 +41,30 @@ export default function LoginForm() {
     };
 
     const handleGoogleLogin = () => {
-        const width = 500;
-        const height = 600;
-        const left = window.screen.width / 2 - width / 2;
-        const top = window.screen.height / 2 - height / 2;
-
         const popup = window.open(
             `${backendUrl}/api/login/google`,
-            'GoogleLogin',
-            `width=${width},height=${height},top=${top},left=${left}`
+            "googleLogin",
+            "width=500,height=600"
         );
 
-        const listener = (event) => {
-            const { token } = event.data;
-            if (token) {
-                document.cookie = `BEARER=${token}; Path=/; Secure; SameSite=None`;
+        const listener = async (event) => {
+            if (event.origin !== backendUrl) return;
 
-                window.removeEventListener('message', listener);
+            if (event.data?.oneTimeCode) {
+                const result = await setGoogleLoginCookie(event.data?.oneTimeCode);
 
-                window.location.href = '/';
+                if (!result.success) {
+                    setError(result.error);
+                }
+
+            } else if (event.data?.error) {
+                setError(event.data?.error);
             }
+
+            window.removeEventListener("message", listener);
         };
 
-        window.addEventListener('message', listener);
+        window.addEventListener("message", listener);
     };
 
     return (

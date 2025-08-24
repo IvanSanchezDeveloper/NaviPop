@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Repository\ProductRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use http\Exception\InvalidArgumentException;
 
 #[ORM\Table(name: 'product', schema: 'app')]
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
@@ -47,7 +46,7 @@ class Product
     public function setName(string $name): static
     {
         if (strlen($name) > self::PRODUCT_NAME_LENGTH) {
-            throw new InvalidArgumentException("Product name must be less than " . self::PRODUCT_NAME_LENGTH . " characters.");
+            throw new \InvalidArgumentException("Product name must be less than " . self::PRODUCT_NAME_LENGTH . " characters.");
         }
 
         $this->name = $name;
@@ -87,7 +86,7 @@ class Product
     public function setPrice(string $price): static
     {
         if (!is_numeric($price) || $price <= 0) {
-            throw new InvalidArgumentException("Price must be a positive number.");
+            throw new \InvalidArgumentException("Price must be a positive number.");
         }
 
         $this->price = $price;

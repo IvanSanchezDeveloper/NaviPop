@@ -28,33 +28,31 @@ export default function RegisterForm() {
             setIsSubmitting(false);
         }
     };
-
     const handleGoogleRegister = () => {
-        const width = 500;
-        const height = 600;
-        const left = window.screen.width / 2 - width / 2;
-        const top = window.screen.height / 2 - height / 2;
-
         const popup = window.open(
             `${backendUrl}/api/login/google`,
-            'GoogleLogin',
-            `width=${width},height=${height},top=${top},left=${left}`
+            "googleLogin",
+            "width=500,height=600"
         );
 
-        const listener = (event) => {
+        const listener = async (event) => {
             if (event.origin !== backendUrl) return;
 
-            const { token } = event.data;
-            if (token) {
-                document.cookie = `BEARER=${token}; Path=/; Secure; SameSite=None`;
+            if (event.data?.oneTimeCode) {
+                const result = await setGoogleLoginCookie(event.data?.oneTimeCode);
 
-                window.removeEventListener('JWTMessage', listener);
+                if (!result.success) {
+                    setError(result.error);
+                }
 
-                window.location.href = '/';
+            } else if (event.data?.error) {
+                setError(event.data?.error);
             }
+
+            window.removeEventListener("message", listener);
         };
 
-        window.addEventListener('JWTMessage', listener);
+        window.addEventListener("message", listener);
     };
 
     return (

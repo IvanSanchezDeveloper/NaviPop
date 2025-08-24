@@ -23,6 +23,21 @@ export function AuthProvider({ children }) {
         }
     };
 
+    const setGoogleLoginCookie = async (oneTimeCode) => {
+        try {
+            const response = await axios.post('/login/google/cookie',
+                { oneTimeCode }
+            );
+            await checkAuth();
+            return { success: true };
+        } catch (error) {
+            return {
+                success: false,
+                error: error.response?.data?.error || 'Error while loging in'
+            };
+        }
+    }
+
     const login = async (email, password) => {
         try {
             const response = await axios.post('/login',
@@ -71,6 +86,7 @@ export function AuthProvider({ children }) {
         login,
         logout,
         register,
+        setGoogleLoginCookie,
         checkAuth
     };
 

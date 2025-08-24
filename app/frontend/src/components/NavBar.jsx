@@ -25,7 +25,7 @@ const NavLink = ({ to, children, isHome = false, onClick }) => (
 
 export default function NavBar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isCompactView, setIsCompactView] = useState(false);
+    const [isCompactView, setIsCompactView] = useState(() => window.innerWidth < 700);
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
@@ -101,7 +101,7 @@ export default function NavBar() {
 
 
                     <a
-                        href="https://github.com"
+                        href="https://github.com/IvanSanchezDeveloper"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-[var(--color-primaryText)] hover:text-[var(--color-secondaryText)] text-4xl transition-colors duration-200"
