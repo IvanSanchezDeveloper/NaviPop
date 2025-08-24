@@ -1,5 +1,7 @@
 # NAVIPOP
 
+**Live Demo:** [https://navipop.vercel.app](https://navipop.vercel.app)
+
 A **second-hand shopping web application** where users can:
 
 - Post products for sale.

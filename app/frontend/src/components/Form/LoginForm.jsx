@@ -53,8 +53,6 @@ export default function LoginForm() {
         );
 
         const listener = (event) => {
-            if (event.origin !== backendUrl) return;
-
             const { token } = event.data;
             if (token) {
                 document.cookie = `BEARER=${token}; Path=/; Secure; SameSite=None`;
