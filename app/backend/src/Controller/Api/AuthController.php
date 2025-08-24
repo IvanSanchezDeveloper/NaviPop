@@ -64,7 +64,7 @@ final class AuthController extends AbstractController
     public function connectGoogleCheck(
         ClientRegistry $clientRegistry,
         JWTTokenManagerInterface $jwtManager
-    ): RedirectResponse {
+    ): Response {
         try {
             $googleUser = $clientRegistry->getClient('google')->fetchUser();
             $user = $this->authManager->handleGoogleLogin(
@@ -74,16 +74,26 @@ final class AuthController extends AbstractController
 
             $token = $jwtManager->create($user);
 
-            return AuthResponse::redirect(
-                $this->frontendDomain,
-                $token
-            );
+
+            $html = <<<HTML
+                <!DOCTYPE html>
+                <html lang="en">
+                <head><meta charset="UTF-8"><title>Login Success</title></head>
+                <body>
+                <script>
+                  window.opener.postMessage({ token: "$token" }, "$this->frontendDomain");
+                  window.close();
+                </script>
+                <p>Logging in...</p>
+                </body>
+                </html>
+                HTML;
+
+            return new Response($html, 200, ['Content-Type' => 'text/html']);
 
         } catch (AbstractApiException $e) {
-            return $this->redirect(
-                $this->frontendDomain . '/login'
-                . '?error=' . urlencode($e->getMessage() ?: 'Login failed')
-            );
+            $errorMessage = urlencode($e->getMessage() ?: 'Login failed');
+            return $this->redirect("{$this->frontendDomain}/login?error={$errorMessage}");
         }
     }
 

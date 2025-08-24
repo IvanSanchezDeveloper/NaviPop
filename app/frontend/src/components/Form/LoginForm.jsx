@@ -41,7 +41,31 @@ export default function LoginForm() {
     };
 
     const handleGoogleLogin = () => {
-        window.location.href = `${backendUrl}/api/login/google`;
+        const width = 500;
+        const height = 600;
+        const left = window.screen.width / 2 - width / 2;
+        const top = window.screen.height / 2 - height / 2;
+
+        const popup = window.open(
+            `${backendUrl}/api/login/google`,
+            'GoogleLogin',
+            `width=${width},height=${height},top=${top},left=${left}`
+        );
+
+        const listener = (event) => {
+            if (event.origin !== backendUrl) return;
+
+            const { token } = event.data;
+            if (token) {
+                document.cookie = `BEARER=${token}; Path=/; Secure; SameSite=None`;
+
+                window.removeEventListener('message', listener);
+
+                window.location.href = '/';
+            }
+        };
+
+        window.addEventListener('message', listener);
     };
 
     return (
