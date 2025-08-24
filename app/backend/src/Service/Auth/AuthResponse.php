@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class AuthResponse
 {
     private const JWT_COOKIE_NAME = 'BEARER';
+    private const COOKIE_SAME_SITE = 'None';
     private const HTTP_OK = 200;
 
     public static function createJWTCookie(string $token): Cookie
@@ -20,7 +21,7 @@ class AuthResponse
         )
         ->withSecure(true)
         ->withHttpOnly(true)
-        ->withSameSite('None');
+        ->withSameSite(self::COOKIE_SAME_SITE);
     }
 
     public static function json(array $data, ?string $token = null, int $status = self::HTTP_OK): JsonResponse
@@ -44,7 +45,7 @@ class AuthResponse
             null,   // domain
             true,   // secure
             true,   // httpOnly
-            'None'  // sameSite
+            self::COOKIE_SAME_SITE  // sameSite
         );
 
         return $response;

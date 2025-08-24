@@ -95,13 +95,15 @@ class AuthControllerTest extends AbstractApiTestCase
             $this->authManagerMock
         );
 
-        $response = $controller->connectGoogle($clientRegistryMock);
+        $request = new Request();
+
+        $response = $controller->connectGoogle($clientRegistryMock, $request);
 
         $this->assertInstanceOf(RedirectResponse::class, $response);
         $this->assertEquals(self::GOOGLE_REDIRECT_URL, $response->getTargetUrl());
     }
 
-    public function testConnectGoogleCheckSuccess(): void
+    public function testConnectGoogleCheckSuccessWhenIsPopup(): void
     {
         $this->authManagerMock->method('handleGoogleLogin')
             ->willReturn($this->user);
@@ -124,6 +126,27 @@ class AuthControllerTest extends AbstractApiTestCase
         $this->assertEquals('BEARER', $cookies[0]->getName());
         $this->assertEquals(self::JWT_TOKEN, $cookies[0]->getValue());
     }
+
+    public function testConnectGoogleCheckSuccessWhenIsNotPopup(): void
+    {
+        self::fail();
+    }
+
+    public function testSetGoogleLoginCookieWithNoCode(): void
+    {
+        self::fail();
+    }
+
+    public function testSetGoogleLoginCookieWithExpiredCode(): void
+    {
+        self::fail();
+    }
+
+    public function testSetGoogleLoginCookieSucceeds(): void
+    {
+        self::fail();
+    }
+
 
     public function testConnectGoogleCheckFails(): void
     {

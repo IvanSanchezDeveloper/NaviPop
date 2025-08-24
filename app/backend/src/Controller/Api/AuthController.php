@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
 
 final class AuthController extends AbstractController
 {
@@ -55,15 +54,18 @@ final class AuthController extends AbstractController
 
 
     #[Route('/api/login/google', name: 'connect_google')]
-    public function connectGoogle(ClientRegistry $clientRegistry): RedirectResponse
+    public function connectGoogle(ClientRegistry $clientRegistry, Request $request): RedirectResponse
     {
-        return $clientRegistry->getClient('google')->redirect([
-            'email', 'profile'
-        ]);
+        $client = $clientRegistry->getClient('google');
+
+        return $client->redirect(
+            ['email', 'profile'],
+        );
     }
 
     #[Route('/api/login/google/check', name: 'connect_google_validation')]
     public function connectGoogleCheck(
+        Request $request,
         ClientRegistry $clientRegistry,
         JWTTokenManagerInterface $jwtManager,
         CacheInterface $cache,
@@ -77,12 +79,7 @@ final class AuthController extends AbstractController
 
             $token = $jwtManager->create($user);
 
-            $authCode = bin2hex(random_bytes(16));
-
-            $cache->get($authCode, function (ItemInterface $item) use ($token) {
-                $item->expiresAfter(60); // 1 minute
-                return $token;
-            });
+            $authCode = $this->authManager->generateGoogleAuthCode($cache, $token);
 
             $html = <<<HTML
                 <html>
@@ -94,13 +91,8 @@ final class AuthController extends AbstractController
                             { oneTimeCode: "$authCode" },
                             "$this->frontendDomain"
                           );
-
-                          try {
-                            window.close();
-                          } catch (e) {
-                                                  
-                            document.body.innerHTML =
-                              "<p>Login successful. You can close this window.</p>";
+                          try { window.close(); } catch (e) {
+                            document.body.innerHTML = "<p>Login successful. You can close this window.</p>";
                           }
                         };
                       </script>
@@ -109,7 +101,7 @@ final class AuthController extends AbstractController
                       <p>Finishing login...</p>
                     </body>
                 </html>
-            HTML;
+              HTML;
 
             return new Response($html);
 
@@ -128,13 +120,13 @@ final class AuthController extends AbstractController
         $code = $data['oneTimeCode'] ?? null;
 
         if (!$code) {
-            return new JsonResponse(['error' => 'Missing code'], 400);
+            return new JsonResponse(['error' => 'Unexpected error'], RESPONSE::HTTP_BAD_REQUEST);
         }
 
         $token = $cache->getItem($code)->get();
 
         if (!$token) {
-            return new JsonResponse(['error' => 'Invalid or expired code'], 400);
+            return new JsonResponse(['error' => 'Session expired'], RESPONSE::HTTP_BAD_REQUEST);
         }
 
         $cache->deleteItem($code);

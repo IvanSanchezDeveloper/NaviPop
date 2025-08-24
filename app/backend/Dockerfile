@@ -54,4 +54,5 @@ RUN chmod +x ./build-env.sh
 
 EXPOSE 8000 9003
 
-CMD ["./build-env.sh"]
+ENTRYPOINT ["./build-env.sh"]
+CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8000} -t public"]

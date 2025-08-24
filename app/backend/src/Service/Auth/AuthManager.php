@@ -9,6 +9,8 @@ use App\Exception\WrongCredentialsException;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class AuthManager
 {
@@ -59,6 +61,18 @@ class AuthManager
         $newUser = $this->register($email, null, $googleId);
 
         return $newUser;
+    }
+
+    public function generateGoogleAuthCode(CacheInterface $cache, string $token): string
+    {
+        $authCode = hash('sha256', random_bytes(32));
+
+        $cache->get($authCode, function (ItemInterface $item) use ($token) {
+            $item->expiresAfter(60); // 1 minute expiration
+            return $token;
+        });
+
+        return $authCode;
     }
 
     public function register(string $email, ?string $password, ?string $googleId = null): User
