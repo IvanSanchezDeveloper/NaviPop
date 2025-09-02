@@ -31,9 +31,6 @@ class ProductManager
         ImageHandler::saveImage($image, $this->imagesPath, $fileName);
     }
 
-    /**
-     * @return Product[]
-     */
     public function getAllProducts(): array
     {
         return $this->productRepository->findAll();
@@ -42,6 +39,22 @@ class ProductManager
     public function getProductById(int $id): ?Product
     {
         return $this->productRepository->find($id);
+    }
+
+    public function getPaginatedProducts(int $page = 1, int $limit = 10): array
+    {
+        $offset = ($page - 1) * $limit;
+
+        $products = $this->productRepository->findBy([], null, $limit, $offset);
+
+        $total = $this->productRepository->count([]);
+
+        return [
+            'items' => $products,
+            'total' => $total,
+            'page' => $page,
+            'limit' => $limit
+        ];
     }
 
     public function formatProductData(Product $product, string $baseUrl): array

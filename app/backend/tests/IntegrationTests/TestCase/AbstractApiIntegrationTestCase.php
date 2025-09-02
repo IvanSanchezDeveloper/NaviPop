@@ -2,11 +2,13 @@
 
 namespace App\Tests\IntegrationTests\TestCase;
 
+use App\Entity\User;
 use App\Tests\IntegrationTests\TestCase\AbstractIntegrationTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use function Symfony\Component\String\u;
 
 abstract class AbstractApiIntegrationTestCase extends AbstractIntegrationTestCase
 {
@@ -23,10 +25,14 @@ abstract class AbstractApiIntegrationTestCase extends AbstractIntegrationTestCas
         $this->entityManager->beginTransaction();
     }
 
-    protected function loginUser(): void
+    protected function loginUser(): User
     {
+        $user = $this->createTestUser();
+
         $jwtManager = static::getContainer()->get(JWTTokenManagerInterface::class);
-        $token = $jwtManager->create($this->createTestUser());
+        $token = $jwtManager->create($user);
         $this->client->setServerParameter('HTTP_Authorization', 'Bearer ' . $token);
+
+        return $user;
     }
 }

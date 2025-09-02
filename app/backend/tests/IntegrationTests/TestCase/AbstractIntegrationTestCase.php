@@ -2,6 +2,7 @@
 
 namespace App\Tests\IntegrationTests\TestCase;
 
+use App\Entity\Product;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -53,6 +54,26 @@ abstract class AbstractIntegrationTestCase extends WebTestCase
         $user = $userRepository->createUser($email, $password, $googleId);
 
         return $user;
+    }
+
+    protected function createTestProduct(
+        User $seller,
+        string $name = 'Test Product',
+        float $price = 10.0,
+        string $imagePath = 'test.jpg'
+    ): Product {
+
+        $product = new Product();
+        $product->setName($name);
+        $product->setPrice((string) $price);
+        $product->setImagePath($imagePath);
+        $product->setUserSeller($seller);
+        $product->setCreatedAt(new \DateTime());
+
+        $this->entityManager->persist($product);
+        $this->entityManager->flush();
+
+        return $product;
     }
 
     protected function createUploadedFile(string $filename = 'test.jpg'): UploadedFile

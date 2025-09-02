@@ -57,7 +57,13 @@ class ProductController extends AbstractController
     ): JsonResponse
     {
         try {
-            $products = $this->productManager->getAllProducts();
+            $page = max(1, (int)$request->query->get('page', 1));
+            $limit = max(1, (int)$request->query->get('limit', 10));
+
+            $pagination = $this->productManager->getPaginatedProducts($page, $limit);
+
+            $products = $pagination['items'] ?? [];
+
             $baseUrl = $request->getSchemeAndHttpHost();
 
             $productsData = array_map(
@@ -67,7 +73,13 @@ class ProductController extends AbstractController
 
             return new JsonResponse([
                 'success' => true,
-                'data' => $productsData
+                'data' => $productsData,
+                'pagination' => [
+                    'current_page' => $pagination['page'],
+                    'per_page' => $pagination['limit'],
+                    'total_items' => $pagination['total'],
+                    'total_pages' => ceil($pagination['total'] / $pagination['limit']),
+                ]
             ], Response::HTTP_OK);
 
         } catch (\Exception $e) {
