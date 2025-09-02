@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../api/axiosInstance.jsx';
 import { ProductCard, PlaceholderCard, AddProductCard, LoadingCard } from '../components/ProductCard';
@@ -11,56 +11,105 @@ export default function HomePage() {
     const [cardsLoading, setCardsLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const ITEMS_PER_PAGE = 8;
+
+    const pageCache = useRef({});
+
+    const prefetchNextPage = useCallback(async (nextPage, totalPages) => {
+        if (nextPage > totalPages || pageCache.current[nextPage]) {
+            return;
+        }
+
+        try {
+            const { data } = await axios.get('/products', {
+                params: { page: nextPage, limit: ITEMS_PER_PAGE - 1 },
+            });
+
+            if (data.success) {
+                const newProducts = data.data || [];
+                const newTotalPages = data.pagination?.total_pages || 1;
+                pageCache.current[nextPage] = { products: newProducts, totalPages: newTotalPages };
+            }
+        } catch (err) {
+            console.warn(`Failed to prefetch page ${nextPage}:`, err.message);
+        }
+    }, [ITEMS_PER_PAGE]);
 
     useEffect(() => {
+        const controller = new AbortController();
         const fetchProducts = async () => {
+            if (pageCache.current[page]) {
+                const { products: cachedProducts, totalPages: cachedTotalPages } = pageCache.current[page];
+                setProducts(cachedProducts);
+                setTotalPages(cachedTotalPages);
+                setCardsLoading(false);
+                prefetchNextPage(page + 1, cachedTotalPages);
+                return;
+            }
+
             try {
+
                 setCardsLoading(true);
                 setError(null);
-                const { data } = await axios.get('/products');
+
+                const { data } = await axios.get('/products', {
+                    params: {
+                        page,
+                        limit: ITEMS_PER_PAGE - 1,
+                    },
+                    signal: controller.signal,
+                });
 
                 if (data.success) {
-                    setProducts(data.data || []);
-                    setTotalPages(1);
+                    const newProducts = data.data || [];
+                    const newTotalPages = data.pagination?.total_pages || 1;
+
+                    setProducts(newProducts);
+                    setTotalPages(newTotalPages);
+
+                    pageCache.current[page] = { products: newProducts, totalPages: newTotalPages };
+
+                    prefetchNextPage(page + 1, newTotalPages);
                 } else {
                     setError(data.error);
                 }
             } catch (err) {
+                if (controller.signal.aborted) return;
                 setError('Error loading products');
             } finally {
-                setCardsLoading(false);
+                if (!controller.signal.aborted) setCardsLoading(false);
             }
         };
 
         fetchProducts();
-    }, []);
+
+        return () => {
+            controller.abort();
+        };
+    }, [page, prefetchNextPage]);
 
     const goToAddProduct = () => {
         navigate('/product/new');
     };
 
-    const goToProduct = () => {
-        navigate(`/product/${product.id}`);
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
     };
-
-    const handlePageChange = (newPage) => setPage(newPage);
 
     const renderCards = () => {
         if (cardsLoading) {
-            // Show loading skeleton cards
             return (
                 <>
                     <AddProductCard onClick={goToAddProduct} />
-                    {Array.from({ length: 7 }, (_, i) => (
+                    {Array.from({ length: ITEMS_PER_PAGE - 1 }, (_, i) => (
                         <LoadingCard key={`loading-${i}`} />
                     ))}
                 </>
             );
         }
 
-        // Show real products and placeholders
         const placeholderCards = [];
-        const totalCards = 8;
+        const totalCards = ITEMS_PER_PAGE;
         const usedSlots = products.length + 1; // +1 for add product card
 
         // Content placeholders (3 cards with content)
@@ -97,11 +146,11 @@ export default function HomePage() {
                     {error}
                 </div>
             )}
-            {/* Grid */}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 place-items-start">
                 {renderCards()}
             </div>
-            {/* Pagination */}
+
             <Pagination
                 page={page}
                 totalPages={totalPages}

@@ -74,11 +74,16 @@ class ProductControllerTest extends AbstractApiTestCase
 
     public function testGetProductsSuccess(): void
     {
-        $products = [new Product(), new Product()];
+        $pagination = [
+            'items' => [new Product(), new Product()],
+            'total' => 0,
+            'page' => 1,
+            'limit' => 10
+        ];
 
         $this->productManager->expects($this->once())
-            ->method('getAllProducts')
-            ->willReturn($products);
+            ->method('getPaginatedProducts')
+            ->willReturn($pagination);
 
         $this->productManager->expects($this->exactly(2))
             ->method('formatProductData')
