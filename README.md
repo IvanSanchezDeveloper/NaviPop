@@ -6,7 +6,7 @@ A **second-hand shopping web application** where users can:
 
 - Post products for sale.
 - Browse other users' products.
-- Chat with sellers to negotiate (via Firebase — planned feature).
+- (Planned) Chat with sellers to negotiate via Firebase.
 - (Planned) Make purchases through a **fake** payment platform.
 
 This project was built mainly to **practice frontend & infrastructure skills** and experiment with tools like **Firebase** (for chats) and a payment process simulator.
@@ -32,7 +32,7 @@ Data is stored in a **PostgreSQL** database.
 | Frontend       | <img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" width="25"/> React, ,<img src="https://upload.wikimedia.org/wikipedia/commons/d/d5/Tailwind_CSS_Logo.svg" width="25"/> Tailwind CSS, <img src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Vitejs-logo.svg" width="25"/> Vite                          |
 | Database       | <img src="https://upload.wikimedia.org/wikipedia/commons/2/29/Postgresql_elephant.svg" width="25"/> PostgreSQL                                                                                                                                                                                                                                     |
 | Infrastructure | <img src="https://www.docker.com/wp-content/uploads/2022/03/vertical-logo-monochromatic.png" width="25"/> Docker, <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" width="25"/> GitHub Actions                                                                                                              |
-| Testing        | <img src="https://images.seeklogo.com/logo-png/44/1/phpunit-logo-png_seeklogo-440702.png" width="25"/> PHPUnit, <img src="https://cdn.brandfetch.io/idIq_kF0rb/w/400/h/400/theme/dark/icon.jpeg?c=1dxbfHSJFAPEGdCLU4o5B" width="25"/> Cypress (planned for e2e)                                                                                    |
+| Testing        | <img src="https://static.cdnlogo.com/logos/p/37/phpunit.svg" width="25"/> PHPUnit, <img src="https://cdn.brandfetch.io/idIq_kF0rb/w/400/h/400/theme/dark/icon.jpeg?c=1dxbfHSJFAPEGdCLU4o5B" width="25"/> Cypress (planned for e2e)                                                                                    |
 | Other          | <img src="https://icon2.cleanpng.com/20180426/rwq/avt9jszgj.webp" width="25"/> Firebase                                                                                                                                                                                                                                                            |
 
 ---
@@ -44,6 +44,7 @@ Data is stored in a **PostgreSQL** database.
     - `frontend` – React + Tailwind CSS
     - `db` – PostgreSQL
 - **GitHub Actions** workflow to run tests before merging into `master`.
+- PHPUnit intregration and unit tests.
 - (Planned) Cypress end-to-end tests.
 
 ---
