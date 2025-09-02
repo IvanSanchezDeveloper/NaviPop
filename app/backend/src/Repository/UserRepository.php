@@ -57,7 +57,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         $user = new User();
         $user->setEmail($email);
-        $user->setRoles(['ROLE_USER']);
+        $user->setRoles([User::ROLE_USER]);
         $user->setCreatedAt(new DateTime('now'));
 
         if ($password !== null) {
