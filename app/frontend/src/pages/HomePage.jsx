@@ -31,10 +31,13 @@ export default function HomePage() {
         return (
             <>
                 <AddProductCard onClick={goToAddProduct} />
+
                 {products.map((product) => <ProductCard key={product.id} product={product} />)}
+
                 {Array.from({ length: placeholdersCount }).map((_, i) => (
-                    <PlaceholderCard key={i} type="empty" />
+                    <PlaceholderCard key={i} type={i >= 3 ? "empty" : "content"}/>
                 ))}
+
             </>
         );
     };

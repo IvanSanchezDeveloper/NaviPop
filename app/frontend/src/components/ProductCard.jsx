@@ -62,11 +62,17 @@ export function ProductCard({ product }) {
                        active:translate-y-0 active:shadow-lg
                        transition-all duration-200 cursor-pointer"
         >
-            <img
-                src={product.image || "/react.svg"}
-                alt={product.name}
-                className="h-2/3 w-full object-cover rounded-md mb-2"
-            />
+            <div className="h-2/3 w-full flex items-center justify-center rounded-md mb-2 bg-gray-10">
+                <img
+                    src={product.image || "/logo192.png"}
+                    alt={product.name}
+                    className={
+                        product.image
+                            ? "h-full w-full object-cover rounded-md mb-2"
+                            : "h-16 w-16 object-cover rounded-md mb-2"
+                    }
+                />
+            </div>
             <h2 className="text-sm font-semibold truncate text-primaryText">{product.name}</h2>
             <span className="text-sm text-secondaryText font-bold mt-auto">{product.price} €</span>
         </div>

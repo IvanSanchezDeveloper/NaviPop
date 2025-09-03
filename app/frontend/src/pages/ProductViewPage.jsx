@@ -1,37 +1,16 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import axios from "../api/axiosInstance.jsx";
+import { useEffect } from 'react';
 import { useLoading } from '../contexts/LoadingContext';
+import { useProduct } from '../hooks/useProducts';
 
 export default function ProductViewPage() {
     const { id } = useParams();
-    const [product, setProduct] = useState(null);
     const { isLoading, setIsLoading } = useLoading();
-    const [error, setError] = useState(null);
+    const { product, loading: productLoading, error } = useProduct(id);
 
     useEffect(() => {
-        const fetchProduct = async () => {
-            try {
-                setIsLoading(true);
-                setError(null);
-
-                const { data } = await axios.get(`/products/${id}`);
-
-                if (data.success && data.data) {
-                    setProduct(data.data);
-                } else {
-                    setError(data.error || "Failed to load product");
-                    setProduct(null);
-                }
-            } catch (err) {
-                setError("Error loading product");
-                setProduct(null);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchProduct();
-    }, [id]);
+        setIsLoading(productLoading);
+    }, [productLoading, setIsLoading]);
 
     if (error) {
         return <div className="p-6 text-red-600">{error}</div>;
@@ -43,13 +22,9 @@ export default function ProductViewPage() {
 
     return (
         <div className="flex flex-col lg:flex-row w-full p-6 gap-6 h-full">
-            <div className="flex-1 bg-gray-100 rounded-xl shadow-inner flex items-center justify-center p-4">
-                <span className="text-gray-500 text-lg">💬 Chat coming soon...</span>
-            </div>
-
             <div className="flex-1 bg-white rounded-xl shadow-xl p-6 flex flex-col">
                 <img
-                    src={product.image}
+                    src={product.image || "/logo192.png"}
                     alt={product.name}
                     className="w-full h-80 object-contain rounded-lg mb-4"
                 />
@@ -68,6 +43,9 @@ export default function ProductViewPage() {
                         Buy Now
                     </button>
                 </div>
+            </div>
+            <div className="flex-1 bg-gray-100 rounded-xl shadow-inner flex items-center justify-center p-4">
+                <span className="text-gray-500 text-lg">💬 Chat coming soon...</span>
             </div>
         </div>
     );

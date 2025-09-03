@@ -24,7 +24,7 @@ export default function AppLayout() {
             </main>
 
             <footer className="bg-[var(--color-secondary)] text-white p-4 text-center">
-                Footer aquí
+                Footer here
             </footer>
         </div>
     );
