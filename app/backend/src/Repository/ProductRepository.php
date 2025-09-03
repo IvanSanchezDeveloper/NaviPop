@@ -24,7 +24,7 @@ class ProductRepository extends ServiceEntityRepository
         $product->setUserSeller($seller);
         $product->setName($name);
         $product->setPrice($price);
-        $product->setImagePath($imgPath);
+        $product->setFilename($imgPath);
         $product->setCreatedAt(new DateTime('now'));
 
         $this->getEntityManager()->persist($product);

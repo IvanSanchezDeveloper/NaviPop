@@ -41,7 +41,7 @@ class ProductControllerIntegrationTest extends AbstractApiIntegrationTestCase
         $this->assertEquals($products[0]->getName(), self::TEST_NAME);
 
         //Remove generated image
-        $fileName = $products[0]->getImagePath();
+        $fileName = $products[0]->getFilename();
         $uploadDir = $this->client->getKernel()->getProjectDir() . '/public/uploads/products/';
         $filePath = $uploadDir . $fileName;
 
