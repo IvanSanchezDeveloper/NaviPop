@@ -63,7 +63,7 @@ class ProductManager
             'id' => $product->getId(),
             'name' => $product->getName(),
             'price' => $product->getPrice(),
-            'image' => $baseUrl . '/uploads/products/' . $product->getImagePath(),
+            'image' => $baseUrl . '/uploads/products/' . $product->getFilename(),
         ];
     }
 }

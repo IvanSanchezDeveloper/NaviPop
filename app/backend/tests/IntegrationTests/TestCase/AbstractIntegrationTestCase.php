@@ -60,13 +60,13 @@ abstract class AbstractIntegrationTestCase extends WebTestCase
         User $seller,
         string $name = 'Test Product',
         float $price = 10.0,
-        string $imagePath = 'test.jpg'
+        string $filename = 'test.jpg'
     ): Product {
 
         $product = new Product();
         $product->setName($name);
         $product->setPrice((string) $price);
-        $product->setImagePath($imagePath);
+        $product->setFilename($filename);
         $product->setUserSeller($seller);
         $product->setCreatedAt(new \DateTime());
 

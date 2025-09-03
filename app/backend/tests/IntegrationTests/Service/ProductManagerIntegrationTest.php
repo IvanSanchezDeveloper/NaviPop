@@ -43,12 +43,12 @@ class ProductManagerIntegrationTest extends AbstractIntegrationTestCase
         $this->assertEquals($productName, $product->getName());
         $this->assertEquals($productPrice, $product->getPrice());
         $this->assertEquals($user->getId(), $product->getUserSeller()->getId());
-        $this->assertNotEmpty($product->getImagePath());
+        $this->assertNotEmpty($product->getFilename());
         $this->assertGreaterThanOrEqual($before, $product->getCreatedAt());
         $this->assertLessThanOrEqual($after, $product->getCreatedAt());
 
 
-        $imagePath = $this->imagesPath . '/' . $product->getImagePath();
+        $imagePath = $this->imagesPath . '/' . $product->getFilename();
         $this->assertFileExists($imagePath);
     }
 

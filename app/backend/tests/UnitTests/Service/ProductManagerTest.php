@@ -105,7 +105,7 @@ class ProductManagerTest extends TestCase
         $product = new Product();
         $product->setName('Test Product');
         $product->setPrice('19.99');
-        $product->setImagePath('test.jpg');
+        $product->setFilename('test.jpg');
 
         $baseUrl = 'https://example.com';
 

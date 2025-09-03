@@ -21,7 +21,7 @@ class Product
     private ?string $name = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private ?string $imagePath = null;
+    private ?string $filename = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'products')]
     #[ORM\JoinColumn(nullable: false)]
@@ -54,14 +54,14 @@ class Product
         return $this;
     }
 
-    public function getImagePath(): ?string
+    public function getFilename(): ?string
     {
-        return $this->imagePath;
+        return $this->filename;
     }
 
-    public function setImagePath(string $imagePath): static
+    public function setFilename(string $filename): static
     {
-        $this->imagePath = $imagePath;
+        $this->filename = $filename;
 
         return $this;
     }

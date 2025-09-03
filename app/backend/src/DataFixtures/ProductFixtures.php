@@ -27,7 +27,7 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
             $product = new Product();
 
             $product->setName($faker->text(30));
-            $product->setImagePath(self::FIXTURES_IMAGES_PATH . $faker->randomElement($images));
+            $product->setFilename(self::FIXTURES_IMAGES_PATH . $faker->randomElement($images));
             $product->setPrice($faker->randomFloat(2, 5, 500));
             $product->setCreatedAt($faker->dateTime());
 
