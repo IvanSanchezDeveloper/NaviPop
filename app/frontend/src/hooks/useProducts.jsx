@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import axios from '../api/axiosInstance.jsx';
+import { LRUCache } from 'lru-cache';
 
 const preloadImage = (product) =>
     new Promise((resolve) => {
@@ -8,12 +9,16 @@ const preloadImage = (product) =>
         const img = new Image();
         img.src = product.image;
 
-        img.onload = () => resolve();
+        img.onload = () => {
+            product.imageObject = img;
+            resolve();
+        };
+
         img.onerror = () => {
             const fallback = new Image();
             fallback.src = "/logo192.png";
             fallback.onload = () => {
-                product.image = null;
+                product.imageObject = fallback;
                 resolve();
             };
             fallback.onerror = resolve;
@@ -29,11 +34,15 @@ export const useProducts = (page, itemsPerPage) => {
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const pageCache = useRef({});
+
+    const pageCache = useMemo(() => new LRUCache({ max: 10 }), []);
 
     const fetchPage = useCallback(
         async (pageNum, signal) => {
-            if (pageCache.current[pageNum]) return pageCache.current[pageNum];
+
+            if (pageCache.has(pageNum)) {
+                return pageCache.get(pageNum);
+            }
 
             try {
                 const { data } = await axios.get('/products', {
@@ -49,26 +58,27 @@ export const useProducts = (page, itemsPerPage) => {
                 await preloadImages(products);
 
                 const pageData = { products, totalPages };
-                pageCache.current[pageNum] = pageData;
+
+                pageCache.set(pageNum, pageData);
                 return pageData;
             } catch (err) {
                 if (signal?.aborted) return null;
                 throw err;
             }
         },
-        [itemsPerPage]
+        [itemsPerPage, pageCache]
     );
 
     const prefetchNextPage = useCallback(
         async (nextPage) => {
-            if (nextPage > totalPages || pageCache.current[nextPage]) return;
+            if (nextPage > totalPages || pageCache.has(nextPage)) return;
             try {
                 await fetchPage(nextPage);
             } catch (err) {
                 console.warn(`Failed to prefetch page ${nextPage}:`, err.message);
             }
         },
-        [fetchPage, totalPages]
+        [fetchPage, totalPages, pageCache]
     );
 
     useEffect(() => {
