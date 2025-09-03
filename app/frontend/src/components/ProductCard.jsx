@@ -23,7 +23,7 @@ export function PlaceholderCard({ type = 'content' }) {
 
     return (
         <div className="h-[240px] w-full bg-white rounded-xl shadow-2xl p-4 flex flex-col opacity-70">
-            <div className="h-2/3 w-full flex items-center justify-center rounded-md mb-2 bg-gray-10">
+            <div className="h-6/8 w-full flex items-center justify-center rounded-md mb-2 bg-gray-10">
                 <img
                     src="/logo192.png"
                     alt="Placeholder"
@@ -62,7 +62,7 @@ export function ProductCard({ product }) {
                        active:translate-y-0 active:shadow-lg
                        transition-all duration-200 cursor-pointer"
         >
-            <div className="h-2/3 w-full flex items-center justify-center rounded-md mb-2 bg-gray-10">
+            <div className="h-6/8 w-full flex items-center justify-center rounded-md mb-2 bg-gray-10">
                 <img
                     src={product.image || "/logo192.png"}
                     alt={product.name}

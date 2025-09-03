@@ -18,6 +18,7 @@ const preloadImage = (product) =>
             const fallback = new Image();
             fallback.src = "/logo192.png";
             fallback.onload = () => {
+                product.image = null;
                 product.imageObject = fallback;
                 resolve();
             };
