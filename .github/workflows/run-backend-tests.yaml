@@ -42,11 +42,15 @@ jobs:
           libcurl4-openssl-dev \
           libssl-dev \
           iproute2 \
-          git unzip zip libpq-dev \
+          git \
+          unzip \
+          zip \
+          libpq-dev \
           libxml2-dev \
           libpng-dev \
           libjpeg-dev \
           libfreetype6-dev \
+          libmagickwand-dev \
           && docker-php-ext-configure gd --with-freetype --with-jpeg \
           && docker-php-ext-install \
           pdo \
@@ -55,7 +59,11 @@ jobs:
           soap \
           curl \
           fileinfo \
-          gd
+          gd \
+          intl \
+          && pecl install imagick \
+          && docker-php-ext-enable imagick \
+          && apt-get clean && rm -rf /var/lib/apt/lists/*
 
       - name: Install Composer
         run: |

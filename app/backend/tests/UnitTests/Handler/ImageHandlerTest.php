@@ -10,6 +10,12 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImageHandlerTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        ImageHandler::setImagick(null);
+    }
+
     public function testValidateImageWithValidImageDoesNotThrowException(): void
     {
         $uploadedFile1 = $this->createMockUploadedFile('image/png', 1024 * 1024); // 1MB
@@ -43,7 +49,7 @@ class ImageHandlerTest extends TestCase
 
         $fileName = ImageHandler::getUniqueFileName($uploadedFile);
 
-        $this->assertStringEndsWith('.jpg', $fileName);
+        $this->assertStringEndsWith('.webp', $fileName);
     }
 
     public function testGetUniqueFileNameGeneratesUniqueNames(): void
@@ -63,9 +69,13 @@ class ImageHandlerTest extends TestCase
         $uploadDir = sys_get_temp_dir() . '/test_upload_' . uniqid();
         $fileName = 'test.jpg';
 
-        $uploadedFile->expects($this->once())
-            ->method('move')
-            ->with($uploadDir, $fileName);
+        $imagickMock = $this->createMock(\Imagick::class);
+        $imagickMock->expects($this->once())->method('setImageFormat')->with('webp');
+        $imagickMock->expects($this->once())->method('setImageCompressionQuality')->with(80);
+        $imagickMock->expects($this->once())->method('writeImage');
+        $imagickMock->expects($this->once())->method('clear');
+
+        ImageHandler::setImagick($imagickMock);
 
         ImageHandler::saveImage($uploadedFile, $uploadDir, $fileName);
 

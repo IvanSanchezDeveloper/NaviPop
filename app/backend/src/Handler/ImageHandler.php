@@ -17,6 +17,10 @@ class ImageHandler
 
     private const ALLOWED_MIME_IMG_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
 
+    public const IMAGE_WEBP_EXTENSION = 'webp';
+
+    private static ?\Imagick $imagick = null;
+
 
     public static function validateImage(UploadedFile $image): void
     {
@@ -32,17 +36,32 @@ class ImageHandler
 
     public static function getUniqueFileName(UploadedFile $image): string
     {
-        $fileName = uniqid() . '.' . $image->guessExtension();
+        $fileName = uniqid() . '.' . self::IMAGE_WEBP_EXTENSION;
 
         return $fileName;
     }
 
-    public static function saveImage(UploadedFile $image, string $uploadDir, string $fileName): void
+    public static function saveImage(UploadedFile $image, string $uploadDir, string $fileName, int $quality = 80): void
     {
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
         }
 
-        $image->move($uploadDir, $fileName);
+        $imagick = self::$imagick ?? new \Imagick($image->getPathname());
+        $imagick->setImageFormat('webp');
+        $imagick->setImageCompressionQuality($quality);
+
+        $webpFileName = pathinfo($fileName, PATHINFO_FILENAME) . '.webp';
+        $webpPath = rtrim($uploadDir, '/') . '/' . $webpFileName;
+
+        $imagick->writeImage($webpPath);
+
+        $imagick->clear();
+    }
+
+    // For testing purposes only
+    public static function setImagick(?\Imagick $imagick): void
+    {
+        self::$imagick = $imagick;
     }
 }

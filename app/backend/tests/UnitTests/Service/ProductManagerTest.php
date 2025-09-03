@@ -6,6 +6,7 @@ use App\Entity\Product;
 use App\Entity\User;
 use App\Exception\ImageMaxSizeExceededException;
 use App\Exception\ImageTypeNotAllowedException;
+use App\Handler\ImageHandler;
 use App\Repository\ProductRepository;
 use App\Service\ProductManager;
 use PHPUnit\Framework\TestCase;
@@ -22,6 +23,8 @@ class ProductManagerTest extends TestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->productRepository = $this->createMock(ProductRepository::class);
         $this->imagesPath = sys_get_temp_dir() . '/test/images';
         $this->productManager = new ProductManager($this->productRepository, $this->imagesPath);
@@ -37,13 +40,22 @@ class ProductManagerTest extends TestCase
         $uploadedFile->method('getMimeType')->willReturn('image/jpeg');
         $uploadedFile->method('getSize')->willReturn(1024 * 1024); // 1MB
         $uploadedFile->method('guessExtension')->willReturn('jpg');
-        $uploadedFile->method('move');
+
+        $imagickMock = $this->createMock(\Imagick::class);
+        $imagickMock->expects($this->once())->method('setImageFormat')->with('webp');
+        $imagickMock->expects($this->once())->method('setImageCompressionQuality')->with(80);
+        $imagickMock->expects($this->once())->method('writeImage')->with($this->isType('string'));
+        $imagickMock->expects($this->once())->method('clear');
+
+        ImageHandler::setImagick($imagickMock);
 
         $this->productRepository->expects($this->once())
             ->method('createProduct')
             ->with($user, $name, $price, $this->isType('string'));
 
         $this->productManager->createProduct($user, $name, $price, $uploadedFile);
+
+        ImageHandler::setImagick(null);
     }
 
     public function testGetAllProductsReturnsArray(): void
